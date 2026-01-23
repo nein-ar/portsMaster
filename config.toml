@@ -4,7 +4,7 @@ footer_text = "The DeriveLinux Quality Larping Center"
 source_code_url = "https://codeberg.org/derivelinux/ports"
 
 # Paths
-ports_path = "/home/anto/Documents/ItAll/derive2.d/ports"
+ports_path = "./ports"
 out_dir = "./public"
 cache_dir = "./.cache"
 assets_dir = "./assets"
