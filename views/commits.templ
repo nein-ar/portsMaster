@@ -1,0 +1,34 @@
+package views
+
+import (
+	"portsMaster/pkg/model"
+	"portsMaster/pkg/config"
+)
+
+templ Commits(data *model.SiteData, cfg *config.Config, currentPath string) {
+	@Layout("Commit Log", data, cfg, currentPath) {
+		<div class="section-header">Commit Log</div>
+
+		<div class="commit-filters">
+			<div>
+				<label for="author-filter">Author:</label>
+				<select id="author-filter">
+					<option value="">All Authors</option>
+				</select>
+			</div>
+
+			<div>
+				<label for="timeframe-filter">Timeframe:</label>
+				<select id="timeframe-filter">
+					<option value="All time">All time</option>
+					<option value="Last 7 days">Last 7 days</option>
+					<option value="Last 30 days">Last 30 days</option>
+				</select>
+			</div>
+		</div>
+
+		<div id="commit-log-container" class="commit-log" data-commits-url={ string(Href(currentPath, "/commits.json")) }>
+			<p class="loading-msg">Loading commit log...</p>
+		</div>
+	}
+}

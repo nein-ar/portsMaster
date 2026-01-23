@@ -1,0 +1,109 @@
+The cheapest, fastest, and most reliable components are those that aren’t there.
+!---
+One of my most productive days was throwing away 1000 lines of code.
+!---
+When in doubt, use brute force.
+!---
+Deleted code is debugged code.
+!---
+Controlling complexity is the essence of computer programming.
+!---
+UNIX was not designed to stop its users from doing stupid things.
+!---
+If you’re willing to restrict flexibility, you can almost always do something better.
+!---
+A data structure is just a stupid programming language.
+!---
+A program that produces incorrect results twice as fast is infinitely slower.
+!---
+Life is too short to run proprietary software.
+!---
+Ethernet always wins.
+!---
+The central enemy of reliability is complexity.
+!---
+Simplicity is prerequisite for reliability.
+!---
+Beware of “the real world”.
+!---
+A program is portable to the extent that it can be moved without rewriting it.
+!---
+If it doesn’t work, it doesn’t matter how fast it doesn’t work.
+!---
+Unix is simple. It just takes a genius to understand its simplicity.
+!---
+The key to performance is elegance, not special cases.
+!---
+Measuring progress by lines of code is like measuring aircraft by weight.
+!---
+First, solve the problem. Then, write the code.
+!---
+Correctness is clearly the prime quality.
+!---
+A language that doesn’t have everything is actually easier to program in.
+!---
+You can’t trust code you did not totally create yourself.
+!---
+Object-oriented design is the roman numerals of computing.
+!---
+Simplicity is the ultimate sophistication.
+!---
+Compatibility means deliberately repeating other people’s mistakes.
+!---
+The best code is no code at all.
+!---
+Before software can be reusable it first has to be usable.
+!---
+More computing sins are committed in the name of efficiency.
+!---
+Program testing can show the presence of bugs, not their absence.
+!---
+Code never lies, comments sometimes do.
+!---
+What I cannot build, I do not understand.
+!---
+The whole point of getting things done is knowing what to leave undone.
+!---
+When in doubt, leave it out.
+!---
+No code is faster than no code.
+!---
+As a rule, software does not work well until it has failed repeatedly.
+!---
+IDE features are language smells.
+!---
+A good way to have good ideas is by being unoriginal.
+!---
+Software gets slower faster than hardware gets faster.
+!---
+The purpose of software engineering is to control complexity.
+!---
+Simplicity is hard to build, easy to use.
+!---
+The unavoidable price of reliability is simplicity.
+!---
+Trying to outsmart a compiler defeats the purpose of using one.
+!---
+You’re bound to be unhappy if you optimize everything.
+!---
+A distributed system is one where failure you didn’t know about breaks you.
+!---
+The proper use of comments is to compensate for bad code.
+!---
+The best is the enemy of the good.
+!---
+Simplicity is the art of maximizing work not done.
+!---
+Complexity has nothing to do with intelligence.
+!---
+So much complexity comes from making one thing do two things.
+!---
+There’s nothing in computing that can’t be broken by indirection.
+!---
+A complex system that works evolved from a simple system that worked.
+!---
+Premature optimization is troublesome; premature abstraction is deadly.
+!---
+Languages that try to disallow idiocy become idiotic.
+!---
+You have 20% less gray matter in your brain than the person who built this site

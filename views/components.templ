@@ -1,0 +1,32 @@
+package views
+
+import (
+	"portsMaster/pkg/model"
+)
+
+// SearchForm renders the search input, category select, and optionally license select.
+templ SearchForm(data *model.SiteData, currentPath string, formID, inputID, selectID string, showAdvanced bool) {
+	<form class="search-box" action={ Href(currentPath, "/search/index.html") } method="GET" id={ formID }>
+		<input type="text" name="q" placeholder="search ports" id={ inputID }/>
+		
+		<select name="cat" id={ selectID }>
+			<option value="">all categories</option>
+			if data != nil {
+				for _, c := range data.Categories {
+					<option value={ c.Name }>{ c.Name }</option>
+				}
+			}
+		</select>
+
+		if showAdvanced && data != nil {
+			<select name="lic" id="search-lic">
+				<option value="">all licenses</option>
+				for l := range data.LicenseStats {
+					<option value={ l }>{ l }</option>
+				}
+			</select>
+		}
+
+		<input type="submit" value="search"/>
+	</form>
+}

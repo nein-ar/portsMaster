@@ -1,0 +1,95 @@
+package views
+
+import (
+	"portsMaster/pkg/config"
+	"portsMaster/pkg/model"
+	"fmt"
+	"strings"
+	"time"
+)
+
+templ Header(title string, cfg *config.Config, currentPath string) {
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title } - { cfg.Title }</title>
+		if cfg.Domain != "" {
+			<link rel="canonical" href={ "https://" + cfg.Domain + "/" + strings.TrimPrefix(currentPath, "/") }/>
+		}
+		if cfg.Favicon != "" {
+			<link rel="icon" type="image/svg+xml" href={ Href(currentPath, cfg.AssetURL(cfg.Favicon)) }/>
+		}
+		for _, css := range cfg.ExtraCSS {
+			<link rel="stylesheet" href={ Href(currentPath, cfg.AssetURL(css)) }/>
+		}
+		for _, js := range cfg.ExtraJS {
+			<script src={ Href(currentPath, cfg.AssetURL(js)) }></script>
+		}
+	</head>
+}
+
+templ Nav(cfg *config.Config, currentPath string) {
+	<header>
+		<h1>{ cfg.Title }</h1>
+		<p>{ cfg.Description }</p>
+	</header>
+
+	<nav>
+		<a href={ Href(currentPath, "/") }>Home</a>
+		<a href={ Href(currentPath, "/categories") }>Categories</a>
+		<a href={ Href(currentPath, "/commits") }>Recent Commits</a>
+		<a href={ Href(currentPath, "/search") }>Search</a>
+		<a href={ Href(currentPath, "/stats") }>Statistics</a>
+	</nav>
+}
+
+templ FortuneBox() {
+	<div id="fortune-box" class="fortune-box">
+		<span class="fortune-marker">?</span>
+		<span id="fortune-text">Loading fortune...</span>
+	</div>
+}
+
+templ Footer(cfg *config.Config, currentPath string) {
+	<footer>
+		<div class="footer-content">
+			<p>{ cfg.FooterText }: <a href={ templ.SafeURL(cfg.SourceCodeURL) }>{ strings.TrimPrefix(strings.TrimPrefix(cfg.SourceCodeURL, "https://"), "http://") }</a></p>
+			<p>Report issues on the tracker. Verify all checksums. Build from source.</p>
+		</div>
+	</footer>
+}
+
+templ StatsBar(data *model.SiteData) {
+	<div class="stats">
+		<span><strong>{ fmt.Sprintf("%d", data.TotalPorts) }</strong> total ports</span>
+		<span><strong>{ fmt.Sprintf("%d", data.UpdatedThisWeek) }</strong> updated this week</span>
+		<span><strong>{ fmt.Sprintf("%d", len(data.Categories)) }</strong> categories</span>
+		<span><strong>{ fmt.Sprintf("%d", data.BrokenCount) }</strong> building failed</span>
+		<span>last update: { time.Now().UTC().Format("2006-01-02 15:04") } UTC</span>
+	</div>
+}
+
+templ SearchSection(data *model.SiteData, currentPath string) {
+	<div class="search-section">
+		@SearchForm(data, currentPath, "", "", "", false)
+	</div>
+}
+
+templ Layout(title string, data *model.SiteData, cfg *config.Config, currentPath string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		@Header(title, cfg, currentPath)
+		<body data-source-code-url={ cfg.SourceCodeURL } data-base-url={ cfg.BaseURL }>
+			@Nav(cfg, currentPath)
+			@SearchSection(data, currentPath)
+			if data != nil {
+				@StatsBar(data)
+			}
+			<main class="main-content">
+				@FortuneBox()
+				{ children... }
+			</main>
+			@Footer(cfg, currentPath)
+		</body>
+	</html>
+}

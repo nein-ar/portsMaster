@@ -1,0 +1,79 @@
+package views
+
+import (
+	"portsMaster/pkg/model"
+	"portsMaster/pkg/config"
+	"portsMaster/pkg/util"
+	"time"
+)
+
+templ Home(data *model.SiteData, recent []*model.Port, cfg *config.Config, currentPath string) {
+	@Layout(cfg.Title, data, cfg, currentPath) {
+		<div class="quick-links">
+			<h3>Quick Links</h3>
+			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:new")) }>New Ports</a>
+			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:updated")) }>Recently Updated</a>
+			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:broken")) }>Build Failures</a>
+			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:unmaintained")) }>Unmaintained</a>
+			<a href={ templ.SafeURL(Href(currentPath, "/feed.xml")) }>RSS Feed</a>
+		</div>
+
+		<div class="section-header">Recent Port Updates</div>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Port</th>
+					<th>Version</th>
+					<th>Category</th>
+					<th>Description</th>
+					<th>Updated</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, p := range recent {
+					<tr>
+						<td><a href={ templ.SafeURL(Href(currentPath, "/ports/"+p.Category+"/"+p.Name+"/index.html")) } class="port-name">{ p.Name }</a></td>
+						<td class="version">{ p.Version }</td>
+						<td><a href={ templ.SafeURL(Href(currentPath, "/categories/"+p.Category+"/index.html")) } class="category-link">/{ p.Category }</a></td>
+						<td>{ p.Description }</td>
+						if p.LastCommit != nil {
+							if time.Since(p.LastCommit.Date) < 24*time.Hour {
+								<td class="updated-recent">{ util.FormatTimeAgo(p.LastCommit.Date) }</td>
+							} else {
+								<td>{ util.FormatTimeAgo(p.LastCommit.Date) }</td>
+							}
+						} else {
+							<td>-</td>
+						}
+						if p.IsBroken {
+							<td class="status-broken">✗</td>
+						} else {
+							<td class="status-ok">✓</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+
+		<div class="section-header">Categories</div>
+		<div class="category-grid">
+			for _, c := range data.Categories {
+				<div class="category-box">
+					<a href={ templ.SafeURL(Href(currentPath, "/categories/"+c.Name)) }>{ c.Name }</a><br/>
+					<span class="count">{ util.Plural(len(c.Ports), "port") }</span>
+				</div>
+			}
+		</div>
+
+		<div class="section-header">Recent Commits</div>
+		<div class="commit-log">
+			for i, c := range data.RecentCommits {
+				if i < 5 {
+					@CommitEntry(c, cfg)
+				}
+			}
+		</div>
+	}
+}

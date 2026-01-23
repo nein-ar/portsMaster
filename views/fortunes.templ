@@ -1,0 +1,18 @@
+package views
+
+import "fmt"
+
+templ FortunesScript(fortunes []string) {
+	@templ.Raw("document.addEventListener('DOMContentLoaded', () => {\n")
+	@templ.Raw("\tconst fortunes = [\n")
+	for _, f := range fortunes {
+		@templ.Raw(fmt.Sprintf("\t\t%q,\n", f))
+	}
+	@templ.Raw("\t];\n")
+	@templ.Raw("\tconst el = document.getElementById('fortune-text');\n")
+	@templ.Raw("\tif (el && fortunes.length > 0) {\n")
+	@templ.Raw("\t	const r = Math.floor(Math.random() * fortunes.length);\n")
+	@templ.Raw("\t	el.innerText = fortunes[r];\n")
+	@templ.Raw("\t}\n")
+	@templ.Raw("});\n")
+}

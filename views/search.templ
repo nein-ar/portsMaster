@@ -1,0 +1,71 @@
+package views
+
+import (
+	"portsMaster/pkg/config"
+	"portsMaster/pkg/model"
+)
+
+templ Search(data *model.SiteData, cfg *config.Config, currentPath string) {
+	@Layout("Search", data, cfg, currentPath) {
+		<div class="section-header">Advanced Search</div>
+
+		<div id="search-app" data-ports-url={ string(Href(currentPath, "/ports.json")) }>
+			<noscript>JavaScript is required for search functionality.</noscript>
+			
+			<div class="syntax-box">
+				@SearchForm(data, currentPath, "advanced-search-form", "search-input", "search-cat", true)
+				
+				<div class="syntax-help">
+					<table class="syntax-table">
+						<tr>
+							<td><strong>name:val</strong></td>
+							<td>Search by port name</td>
+						</tr>
+						<tr>
+							<td><strong>depends:val</strong></td>
+							<td>Search by dependency</td>
+						</tr>
+						<tr>
+							<td><strong>provides:val</strong></td>
+							<td>Search by virtual package</td>
+						</tr>
+						<tr>
+							<td><strong>category:val</strong></td>
+							<td>Filter by category</td>
+						</tr>
+						<tr>
+							<td><strong>license:val</strong></td>
+							<td>Filter by license</td>
+						</tr>
+						<tr>
+							<td><strong>author:val</strong></td>
+							<td>Filter by maintainer</td>
+						</tr>
+						<tr>
+							<td><strong>is:broken</strong></td>
+							<td>Show only broken ports</td>
+						</tr>
+						<tr>
+							<td><strong>is:new</strong></td>
+							<td>Show ports updated in last 30 days</td>
+						</tr>
+						<tr>
+							<td><strong>is:updated</strong></td>
+							<td>Show ports updated in last 7 days</td>
+						</tr>
+						<tr>
+							<td><strong>!val</strong></td>
+							<td>Negate match</td>
+						</tr>
+						<tr>
+							<td><strong>||</strong> or <strong> OR </strong></td>
+							<td>Logical OR</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<div id="search-results"></div>
+		</div>
+	}
+}
