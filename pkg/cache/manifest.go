@@ -3,6 +3,7 @@ package cache
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -38,6 +39,9 @@ func LoadManifest(path string) *Manifest {
 func (m *Manifest) Save(path string) error {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return err
+	}
 	f, err := os.Create(path)
 	if err != nil {
 		return err

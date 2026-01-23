@@ -196,6 +196,7 @@ func (e *Engine) exportJSON(path string, data interface{}, global string) {
 	}
 
 	full := e.reg.PublicPage(path)
+	os.MkdirAll(filepath.Dir(full), 0755)
 	f, err := os.Create(full)
 	if err != nil {
 		return

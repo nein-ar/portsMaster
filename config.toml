@@ -2,7 +2,7 @@ title = "DeriveLinux Ports"
 description = "THE LAST PUNK DISTRO"
 footer_text = "The DeriveLinux Quality Larping Center"
 source_code_url = "https://codeberg.org/derivelinux/ports"
-domain = ports.derivelinux.nein.ar
+domain = "ports.derivelinux.nein.ar"
 
 # Paths
 ports_path = "./ports"
