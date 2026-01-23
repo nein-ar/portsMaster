@@ -8,14 +8,20 @@ import (
 
 templ CategoryList(data *model.SiteData, cfg *config.Config, currentPath string) {
 	@Layout("Categories", data, cfg, currentPath) {
-		<div class="section-header">Categories</div>
-		<div class="category-grid">
-			for _, c := range data.Categories {
-				<div class="category-box">
-					<a href={ templ.SafeURL(Href(currentPath, "/categories/"+c.Name)) }>{ c.Name }</a><br>
-					<span class="count">{ fmt.Sprintf("%d ports", len(c.Ports)) }</span>
-				</div>
-			}
+		<div class="breadcrumb">
+			<a href={ Href(currentPath, "/") }>home</a> / categories
+		</div>
+
+		<div class="main-content">
+			<div class="section-header">All Categories</div>
+			<div class="category-grid">
+				for _, c := range data.Categories {
+					<div class="category-box">
+						<a href={ Href(currentPath, "/categories/"+c.Name+"/index.html") }>{ c.Name }</a><br/>
+						<span class="count">{ fmt.Sprintf("%d ports", len(c.Ports)) }</span>
+					</div>
+				}
+			</div>
 		</div>
 	}
 }

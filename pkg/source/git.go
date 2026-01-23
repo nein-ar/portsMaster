@@ -96,19 +96,29 @@ func (g *GitProvider) GetRepositoryData(ports []*model.Port) (map[string][]*mode
 	count := 0
 
 	err = cIter.ForEach(func(c *object.Commit) error {
-		email := strings.ToLower(strings.TrimSpace(c.Author.Email))
-		if email == "" {
-			email = "unknown"
-		}
-
-		stats, ok := contributorStats[email]
-		if !ok {
-			stats = &model.Contributor{Name: c.Author.Name, Email: email}
-			contributorStats[email] = stats
-		}
-		stats.Count++
-		stats.Name = c.Author.Name
-
+		                email := strings.ToLower(strings.TrimSpace(c.Author.Email))
+		                if email == "" {
+		                        email = "unknown"
+		                }
+		
+		                stats, ok := contributorStats[email]
+		                if !ok {
+		                        stats = &model.Contributor{Name: c.Author.Name, Email: email}
+		                        contributorStats[email] = stats
+		                }
+		                stats.Count++
+		                if c.Author.Name != stats.Name {
+		                        found := false
+		                        for _, n := range stats.OtherNames {
+		                                if n == c.Author.Name {
+		                                        found = true
+		                                        break
+		                                }
+		                        }
+		                        if !found {
+		                                stats.OtherNames = append(stats.OtherNames, c.Author.Name)
+		                        }
+		                }
 		mc := &model.Commit{
 			Hash:    c.Hash.String(),
 			Author:  c.Author.Name,

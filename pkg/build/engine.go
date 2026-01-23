@@ -357,37 +357,42 @@ func (e *Engine) getRecentUpdates(ports []*model.Port) []*model.Port {
 }
 
 func (e *Engine) buildSearchIndex(ports []*model.Port) interface{} {
-	type Entry struct {
-		N  string   `json:"n"`
-		C  string   `json:"c"`
-		D  string   `json:"d"`
-		V  string   `json:"v"`
-		L  string   `json:"l,omitempty"`
-		Ps []string `json:"pds,omitempty"`
-		Ds []string `json:"dps,omitempty"`
-		Br bool     `json:"br,omitempty"`
-		Un bool     `json:"un,omitempty"`
-		Dt int64    `json:"dt,omitempty"`
-		A  string   `json:"a,omitempty"`
-	}
-	out := make([]Entry, 0, len(ports))
-	for _, p := range ports {
-		ds := make([]string, len(p.Deps))
-		for i, d := range p.Deps {
-			ds[i] = d.Name
-		}
-		dt := int64(0)
-		if p.LastCommit != nil {
-			dt = p.LastCommit.Date.Unix()
-		}
-		out = append(out, Entry{
-			N: p.Name, C: p.Category, D: p.Description, V: p.Version,
-			L: p.License, Ps: p.Provides, Ds: ds, Br: p.IsBroken,
-			Un: p.IsUnmaintained, Dt: dt, A: p.Maintainer,
-		})
-	}
-	return out
-}
+	        type Entry struct {
+	                N  string   `json:"n"`
+	                C  string   `json:"c"`
+	                D  string   `json:"d"`
+	                V  string   `json:"v"`
+	                L  string   `json:"l,omitempty"`
+	                Ps []string `json:"pds,omitempty"`
+	                Ds []string `json:"dps,omitempty"`
+	                Br bool     `json:"br,omitempty"`
+	                Un bool     `json:"un,omitempty"`
+	                Dt int64    `json:"dt,omitempty"`
+	                A  string   `json:"a,omitempty"`
+	                St string   `json:"st,omitempty"`
+	        }
+	        out := make([]Entry, 0, len(ports))
+	        for _, p := range ports {
+	                ds := make([]string, len(p.Deps))
+	                for i, d := range p.Deps {
+	                        ds[i] = d.Name
+	                }
+	                dt := int64(0)
+	                if p.LastCommit != nil {
+	                        dt = p.LastCommit.Date.Unix()
+	                }
+	                st := ""
+	                if p.CI != nil {
+	                        st = p.CI.Status
+	                }
+	                                        out = append(out, Entry{
+	                                                N: p.Name, C: p.Category, D: p.Description, V: p.Version,
+	                                                L: p.License, Ps: p.Provides, Ds: ds, Br: p.IsBroken,
+	                                                Un: p.IsUnmaintained, Dt: dt, A: p.Maintainer, St: st,
+	                                        })
+	                                }
+	                        return out
+	                }
 
 func copyFile(src, dst string) {
 	in, _ := os.Open(src)

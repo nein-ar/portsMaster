@@ -46,28 +46,56 @@ func Search(data *model.SiteData, cfg *config.Config, currentPath string) templ.
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"section-header\">Advanced Search</div><div id=\"search-app\" data-ports-url=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"breadcrumb\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(string(Href(currentPath, "/ports.json")))
+			var templ_7745c5c3_Var3 templ.SafeURL
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(Href(currentPath, "/"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/search.templ`, Line: 12, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/search.templ`, Line: 11, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><noscript>JavaScript is required for search functionality.</noscript><div class=\"syntax-box\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">home</a> / search</div><div class=\"section-header\">Advanced Search</div><form class=\"search-form\" id=\"searchForm\"><div class=\"search-row\"><label for=\"query\">Search Query</label> <input type=\"text\" id=\"query\" name=\"query\" placeholder=\"enter search terms or filter expression...\"><div class=\"search-examples\"><code>curl</code> - simple text search<br><code>name:git AND category:devel</code> - logical operators<br><code>provides:/usr/bin/vim</code> - file path search<br><code>depends:libressl OR depends:openssl</code> - dependency search<br><code>NOT category:devel</code> - negation<br><code>is:broken</code> - find build failures<br><code>is:new</code> - updated in last 30 days<br><code>since:7d</code> - updated in last 7 days<br><code>description:\"web server\"</code> - exact phrase match</div></div><div class=\"filter-group\"><div class=\"filter-group-header\">Search In</div><div class=\"filter-option\"><input type=\"checkbox\" id=\"search_name\" checked> <label for=\"search_name\">Port Name</label></div><div class=\"filter-option\"><input type=\"checkbox\" id=\"search_desc\" checked> <label for=\"search_desc\">Description</label></div><div class=\"filter-option\"><input type=\"checkbox\" id=\"search_files\"> <label for=\"search_files\">File Paths (provides)</label></div><div class=\"filter-option\"><input type=\"checkbox\" id=\"search_deps\"> <label for=\"search_deps\">Dependencies</label></div></div><div class=\"filter-group\"><div class=\"filter-group-header\">Filters</div><div class=\"search-row\"><label>Category</label> <select name=\"category\" id=\"filter-category\"><option value=\"\">any</option> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = SearchForm(data, currentPath, "advanced-search-form", "search-input", "search-cat", true).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+			for _, c := range data.Categories {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<option value=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/search.templ`, Line: 59, Col: 29}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(c.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/search.templ`, Line: 59, Col: 40}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</option>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"syntax-help\"><table class=\"syntax-table\"><tr><td><strong>name:val</strong></td><td>Search by port name</td></tr><tr><td><strong>depends:val</strong></td><td>Search by dependency</td></tr><tr><td><strong>provides:val</strong></td><td>Search by virtual package</td></tr><tr><td><strong>category:val</strong></td><td>Filter by category</td></tr><tr><td><strong>license:val</strong></td><td>Filter by license</td></tr><tr><td><strong>author:val</strong></td><td>Filter by maintainer</td></tr><tr><td><strong>is:broken</strong></td><td>Show only broken ports</td></tr><tr><td><strong>is:new</strong></td><td>Show ports updated in last 30 days</td></tr><tr><td><strong>is:updated</strong></td><td>Show ports updated in last 7 days</td></tr><tr><td><strong>!val</strong></td><td>Negate match</td></tr><tr><td><strong>||</strong> or <strong>OR </strong></td><td>Logical OR</td></tr></table></div></div><div id=\"search-results\"></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</select></div></div><div class=\"button-row\"><input type=\"submit\" value=\"search\"> <input type=\"reset\" value=\"clear\"></div></form><div id=\"results\" class=\"results display-none\"><div class=\"result-stats\">Found <strong id=\"resultCount\">0</strong> ports matching query: <code id=\"queryDisplay\"></code> (search took <span id=\"searchTime\">0</span>ms)</div><table id=\"resultsTable\"><thead><tr><th>Port</th><th>Version</th><th>Category</th><th>Description</th></tr></thead> <tbody id=\"resultsBody\"></tbody></table></div><div class=\"section-header\">Filter Syntax Reference</div><table><thead><tr><th>Filter</th><th>Description</th><th>Example</th></tr></thead> <tbody><tr><td><code>name:TERM</code></td><td>Search in port name</td><td><code>name:curl</code></td></tr><tr><td><code>description:TERM</code></td><td>Search in description</td><td><code>description:editor</code></td></tr><tr><td><code>category:CAT</code></td><td>Filter by category</td><td><code>category:network</code></td></tr><tr><td><code>provides:PATH</code></td><td>Find package providing file</td><td><code>provides:/usr/bin/git</code></td></tr><tr><td><code>depends:PKG</code></td><td>Find packages depending on PKG</td><td><code>depends:musl</code></td></tr><tr><td><code>AND</code></td><td>Logical AND operator</td><td><code>name:lib AND category:system</code></td></tr><tr><td><code>OR</code></td><td>Logical OR operator</td><td><code>category:audio OR category:video</code></td></tr><tr><td><code>NOT</code></td><td>Logical NOT operator</td><td><code>NOT license:GPL</code></td></tr><tr><td><code>\"phrase\"</code></td><td>Exact phrase match</td><td><code>description:\"text editor\"</code></td></tr></tbody></table>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

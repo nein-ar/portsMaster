@@ -6,29 +6,34 @@ import (
 )
 
 templ Commits(data *model.SiteData, cfg *config.Config, currentPath string) {
-	@Layout("Commit Log", data, cfg, currentPath) {
-		<div class="section-header">Commit Log</div>
-
-		<div class="commit-filters">
-			<div>
-				<label for="author-filter">Author:</label>
-				<select id="author-filter">
-					<option value="">All Authors</option>
-				</select>
-			</div>
-
-			<div>
-				<label for="timeframe-filter">Timeframe:</label>
-				<select id="timeframe-filter">
-					<option value="All time">All time</option>
-					<option value="Last 7 days">Last 7 days</option>
-					<option value="Last 30 days">Last 30 days</option>
-				</select>
-			</div>
+	@Layout("Recent Commits", data, cfg, currentPath) {
+		<div class="breadcrumb">
+			<a href={ Href(currentPath, "/") }>home</a> / commits
 		</div>
 
-		<div id="commit-log-container" class="commit-log" data-commits-url={ string(Href(currentPath, "/commits.json")) }>
-			<p class="loading-msg">Loading commit log...</p>
+		<div class="section-header">Recent Commits (Last 30 Days)</div>
+
+		<div class="filter-bar">
+			Filter by:
+			<select id="author-filter">
+				<option value="">all authors</option>
+			</select>
+			<select id="category-filter">
+				<option value="">all categories</option>
+				for _, cat := range data.Categories {
+					<option value={ cat.Name }>{ cat.Name }</option>
+				}
+			</select>
+			<select id="timeframe-filter">
+				<option value="All time">all time</option>
+				<option value="Last 24 hours">last 24 hours</option>
+				<option value="Last 7 days">last 7 days</option>
+				<option value="Last 30 days">last 30 days</option>
+			</select>
+		</div>
+
+		<div id="commit-log-container" class="commit-list" data-commits-url={ string(Href(currentPath, "/commits.json")) }>
+			<p class="p-20">Loading commit log...</p>
 		</div>
 	}
 }

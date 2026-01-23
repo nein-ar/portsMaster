@@ -1,155 +1,111 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const advancedForm = document.getElementById('advanced-search-form');
-    const form = advancedForm || document.querySelector('.search-box');
-    
-    if (!form) return;
+    const searchForm = document.getElementById('searchForm');
+    if (!searchForm) return;
 
-    const resultsContainer = advancedForm ? document.getElementById('search-results') : null;
-    const queryInput = form.querySelector('input[name="q"]');
-    const catSelect = form.querySelector('select[name="cat"]');
-    const licSelect = form.querySelector('select[name="lic"]');
-    
-    let index = null;
-    let loadingPromise = null;
-    let debounceTimer;
-    
-    const app = document.getElementById('search-app');
-    const body = document.body;
-    const baseUrl = body.dataset.baseUrl || '';
-    const portsUrl = (app && app.dataset.portsUrl) || (baseUrl + '/ports.json');
+    const queryInput = document.getElementById('query');
+    const resultsDiv = document.getElementById('results');
+    const resultsBody = document.getElementById('resultsBody');
+    const resultCount = document.getElementById('resultCount');
+    const queryDisplay = document.getElementById('queryDisplay');
+    const searchTimeDisplay = document.getElementById('searchTime');
 
-    function loadIndex() {
-        if (index) return Promise.resolve(index);
-        if (loadingPromise) return loadingPromise;
-        loadingPromise = fetch(portsUrl).then(r => r.json()).then(data => { index = data; return data; });
-        return loadingPromise;
-    }
+    const searchName = document.getElementById('search_name');
+    const searchDesc = document.getElementById('search_desc');
+    const searchFiles = document.getElementById('search_files');
+    const searchDeps = document.getElementById('search_deps');
+    const filterCategory = document.getElementById('filter-category');
 
-    function checkUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        const q = params.get('q');
-        const cat = params.get('cat');
-        const lic = params.get('lic');
-        
-        let val = q || '';
-        if (cat) {
-             const tag = `category:${cat}`;
-             if (!val.includes(tag)) val = val ? `${val} && ${tag}` : tag;
-        }
-        if (lic) {
-            const tag = `license:${lic}`;
-            if (!val.includes(tag)) val = val ? `${val} && ${tag}` : tag;
-        }
+    let portsData = [];
+    const baseUrl = document.body.dataset.baseUrl || '';
 
-        if (val) {
-            queryInput.value = val;
-            performSearch();
-        }
-    }
-
-    if (advancedForm || window.location.search) {
-        loadIndex().then(checkUrlParams);
-    }
-
-    queryInput.addEventListener('focus', loadIndex);
-    queryInput.addEventListener('input', () => {
-        if (!advancedForm) return;
-        loadIndex().then(() => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(performSearch, 300);
+    // Load ports data
+    fetch(baseUrl + '/ports.json')
+        .then(r => r.json())
+        .then(data => {
+            portsData = data || [];
+            // Check for query in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const q = urlParams.get('query') || urlParams.get('q');
+            if (q) {
+                queryInput.value = q;
+                performSearch(q);
+            }
         });
-    });
 
-    form.addEventListener('submit', (e) => {
-        if (!advancedForm) return; // Natural submit for global search
+    searchForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        loadIndex().then(() => {
-            performSearch();
-            const url = new URL(window.location);
-            url.searchParams.set('q', queryInput.value);
-            url.searchParams.delete('cat');
-            url.searchParams.delete('lic');
-            window.history.pushState({}, '', url);
-        });
+        performSearch(queryInput.value);
+        // Update URL
+        const url = new URL(window.location);
+        url.searchParams.set('q', queryInput.value);
+        window.history.pushState({}, '', url);
     });
 
-    function handleDropdown(select, prefix) {
-        if (!select) return;
-        select.addEventListener('change', () => {
-            const val = select.value;
-            if (!val) return;
-            if (!advancedForm) { form.submit(); return; }
-            loadIndex(); 
-            let query = queryInput.value;
-            const tag = `${prefix}:${val}`;
-            const regex = new RegExp(`${prefix}:\\S+`, 'g');
-            let cleanQuery = query.replace(regex, '').replace(/&&\\s*$/, '').replace(/^&&\\s*/, '').trim();
-            queryInput.value = cleanQuery.length === 0 ? `${tag} && ` : `${cleanQuery} && ${tag}`;
-            performSearch();
-            select.value = "";
-        });
-    }
+    queryInput.addEventListener('input', () => {
+        const q = queryInput.value.trim();
+        if (q.length > 2 || q === '*') {
+            performSearch(q);
+        }
+    });
 
-    handleDropdown(catSelect, 'category');
-    handleDropdown(licSelect, 'license');
-
-    function performSearch() {
-        if (!index || !resultsContainer) return;
-        const rawQuery = queryInput.value.trim();
+    function performSearch(query) {
+        const startTime = performance.now();
+        const rawQuery = query.toLowerCase().trim();
+        
         if (!rawQuery) {
-            resultsContainer.innerHTML = '';
+            resultsDiv.classList.add('display-none');
             return;
         }
-        if (rawQuery === '*') {
-            renderResults(index);
-            return;
+
+        let filtered = portsData;
+
+        if (rawQuery !== '*') {
+            filtered = portsData.filter(p => evaluateQuery(p, rawQuery));
         }
-        const results = index.filter(p => evaluateQuery(p, rawQuery));
-        renderResults(results);
+
+        // Global category filter from dropdown
+        if (filterCategory.value) {
+            filtered = filtered.filter(p => p.c === filterCategory.value);
+        }
+
+        const endTime = performance.now();
+        displayResults(filtered, query, Math.round(endTime - startTime));
     }
 
     function evaluateQuery(p, query) {
-        const orGroups = query.split(/\\|\\|\\s+OR\\s+/i);
+        // Support logical OR (||)
+        const orGroups = query.split(/\|\||\s+OR\s+/i);
         return orGroups.some(group => {
             const trimmedGroup = group.trim();
             if (!trimmedGroup) return false;
-            return evaluateAndGroup(p, trimmedGroup);
+            // Support logical AND (&&) within groups
+            const tokens = trimmedGroup.split(/&&|\s+AND\s+/i);
+            return tokens.every(token => matchToken(p, token.trim()));
         });
     }
 
-    function evaluateAndGroup(p, groupQuery) {
-        const tokens = [];
-        const regex = /"([^"]+)"|(\S+)/g;
-        let match;
-        while ((match = regex.exec(groupQuery)) !== null) {
-            const token = match[1] || match[2];
-            if (token === '&&' || token.toUpperCase() === 'AND') continue;
-            tokens.push(token);
-        }
-        return tokens.every(token => matchToken(p, token));
-    }
-
     function matchToken(p, token) {
-        let text = token.toLowerCase();
+        if (!token) return true;
+        let text = token;
         let invert = false;
         if (text.startsWith('!')) { invert = true; text = text.substring(1); }
+        if (text.startsWith('NOT ')) { invert = true; text = text.substring(4); }
 
         let match = false;
         if (text.startsWith('name:')) match = p.n.toLowerCase().includes(text.substring(5));
-        else if (text.startsWith('author:')) match = p.a && p.a.toLowerCase().includes(text.substring(7));
-        else if (text.startsWith('category:')) match = p.c.toLowerCase() === text.substring(9);
-        else if (text.startsWith('license:')) match = p.l && p.l.toLowerCase().includes(text.substring(8));
-        else if (text.startsWith('provides:')) match = p.pds && p.pds.some(x => x.toLowerCase().includes(text.substring(9)));
-        else if (text.startsWith('depends:')) match = p.dps && p.dps.some(x => x.toLowerCase().includes(text.substring(8)));
+        else if (text.startsWith('desc:') || text.startsWith('description:')) match = p.d.toLowerCase().includes(text.substring(text.indexOf(':') + 1));
+        else if (text.startsWith('cat:') || text.startsWith('category:')) match = p.c.toLowerCase() === text.substring(text.indexOf(':') + 1);
+        else if (text.startsWith('dep:') || text.startsWith('depends:')) match = p.dps && p.dps.some(d => d.toLowerCase().includes(text.substring(text.indexOf(':') + 1)));
+        else if (text.startsWith('provides:')) match = p.pds && p.pds.some(f => f.toLowerCase().includes(text.substring(9)));
         else if (text === 'is:broken') match = p.br;
         else if (text === 'is:unmaintained') match = p.un;
         else if (text === 'is:new') {
-            const monthAgo = (Date.now() / 1000) - (30 * 24 * 60 * 60);
-            match = p.dt > monthAgo;
+            const thirtyDaysAgo = (Date.now() / 1000) - (30 * 86400000 / 1000);
+            match = p.dt > thirtyDaysAgo;
         }
         else if (text === 'is:updated') {
-            const weekAgo = (Date.now() / 1000) - (7 * 24 * 60 * 60);
-            match = p.dt > weekAgo;
+            const sevenDaysAgo = (Date.now() / 1000) - (7 * 86400000 / 1000);
+            match = p.dt > sevenDaysAgo;
         }
         else if (text.startsWith('since:')) {
             const val = text.substring(6);
@@ -159,58 +115,75 @@ document.addEventListener('DOMContentLoaded', () => {
             let limit = 0;
             if (unit === 'd') limit = now - (num * 24 * 3600);
             else if (unit === 'w') limit = now - (num * 7 * 24 * 3600);
-            else if (unit === 'y') limit = now - (num * 365 * 24 * 3600);
-            else limit = now - (num * 24 * 3600); // default to days
+            else if (unit === 'm') limit = now - (num * 30 * 24 * 3600);
+            else limit = now - (num * 24 * 3600);
             match = p.dt > limit;
         }
         else {
-            match = p.n.toLowerCase().includes(text) || (p.d && p.d.toLowerCase().includes(text)) || (p.c && p.c.toLowerCase().includes(text));
+            // Standard search across multiple fields
+            let fieldsMatch = false;
+            if (searchName.checked && p.n.toLowerCase().includes(text)) fieldsMatch = true;
+            if (searchDesc.checked && p.d.toLowerCase().includes(text)) fieldsMatch = true;
+            if (searchFiles.checked && p.pds?.some(f => f.toLowerCase().includes(text))) fieldsMatch = true;
+            if (searchDeps.checked && p.dps?.some(d => d.toLowerCase().includes(text))) fieldsMatch = true;
+            match = fieldsMatch;
         }
+
         return invert ? !match : match;
     }
 
-    function renderResults(results) {
-        if (results.length === 0) {
-            resultsContainer.innerHTML = '<div class="result-item">No matches found.</div>';
-            return;
-        }
+    function displayResults(results, query, time) {
+        resultsDiv.classList.remove('display-none');
+        resultsDiv.classList.add('display-block');
+        resultCount.textContent = results.length;
+        queryDisplay.textContent = query;
+        searchTimeDisplay.textContent = time;
+        resultsBody.innerHTML = '';
 
-        const rows = results.slice(0, 100).map(p => `
-            <tr>
+        results.slice(0, 200).forEach(p => {
+            const row = document.createElement('tr');
+            const portUrl = baseUrl + '/ports/' + p.c + '/' + p.n + '/index.html';
+            const catUrl = baseUrl + '/categories/' + p.c + '/index.html';
+            
+            let statusClass = 'none';
+            if (p.st === 'success') statusClass = 'success';
+            else if (p.st === 'failed') statusClass = 'failed';
+            else if (p.br) statusClass = 'failed';
+
+            row.innerHTML = `
                 <td>
                     <div class="flex-center">
-                        <span class="status-indicator ${p.br ? 'broken' : 'ok'}"></span>
-                        <a href="${baseUrl}/ports/${p.c}/${p.n}/index.html" class="res-name ${p.br ? 'status-broken' : ''}">${p.n}</a>
+                        <span class="status-dot ${statusClass}"></span>
+                        <a href="${portUrl}" class="port-name">${p.n}</a>
                     </div>
                 </td>
-                <td class="res-ver">${p.v}</td>
-                <td class="res-cat">/${p.c}</td>
-                <td class="res-desc">
-                    ${p.d || ''}
+                <td class="version">${p.v}</td>
+                <td><a href="${catUrl}">/${p.c}</a></td>
+                <td>
+                    ${highlightMatch(p.d, query)}
                     ${p.un ? '<span class="status-unmaintained ml-10">unmaintained</span>' : ''}
                 </td>
-            </tr>
-        `).join('');
+            `;
+            resultsBody.appendChild(row);
+        });
 
-        resultsContainer.innerHTML = `
-            <div class="search-results-container">
-                <div class="search-results-header">
-                    Found ${results.length} results
-                </div>
-                <table class="search-results-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%">Port</th>
-                            <th style="width: 15%">Version</th>
-                            <th style="width: 15%">Category</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rows}
-                    </tbody>
-                </table>
-            </div>
-        `;
+        if (results.length > 200) {
+            const moreRow = document.createElement('tr');
+            moreRow.innerHTML = `<td colspan="4" class="search-results-info">Showing first 200 of ${results.length} results. Refine your search for more.</td>`;
+            resultsBody.appendChild(moreRow);
+        }
+    }
+
+    function highlightMatch(text, query) {
+        if (!query || query.includes(':') || query === '*') return text;
+        const words = query.split(/\s+/).filter(w => w.length > 2 && !['and', 'or', 'not'].includes(w.toLowerCase()));
+        if (words.length === 0) return text;
+        
+        let highlighted = text;
+        words.forEach(word => {
+            const regex = new RegExp(`(${word})`, 'gi');
+            highlighted = highlighted.replace(regex, '<span class="match-highlight">$1</span>');
+        });
+        return highlighted;
     }
 });

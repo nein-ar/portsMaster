@@ -9,25 +9,18 @@ import (
 
 templ CommitEntry(c *model.Commit, cfg *config.Config) {
 	<div class="commit-entry">
-		<span class="commit-time">{ c.Date.Format("2006-01-02 15:04") }</span>
-		<span class="commit-author">{ c.Author }</span>
+		<div class="commit-header">
+			<span class="commit-hash">{ c.Hash[:7] }</span>
+			<span class="commit-time">{ c.Date.Format("2006-01-02 15:04") }</span>
+			<span class="commit-author">{ c.Author }</span>
+		</div>
 		if lines := strings.Split(c.Message, "\n"); len(lines) > 0 {
-			<a href={ templ.SafeURL(fmt.Sprintf("%s/commit/%s", cfg.SourceCodeURL, c.Hash)) } class="commit-link">{ lines[0] }</a>
+			<div class="commit-title">
+				<a href={ templ.SafeURL(fmt.Sprintf("%s/commit/%s", cfg.SourceCodeURL, c.Hash)) }>{ lines[0] }</a>
+			</div>
 			if len(lines) > 1 {
-				<br/>
-				<span class="commit-msg">{ strings.Join(lines[1:], " ") }</span>
+				<div class="commit-msg">{ strings.Join(lines[1:], "\n") }</div>
 			}
 		}
-		<div class="commit-file-stats">
-			if len(c.AddedFiles) > 0 {
-				<span class="files-added">+{ fmt.Sprintf("%d", len(c.AddedFiles)) }</span>
-			}
-			if len(c.ModifiedFiles) > 0 {
-				<span class="files-modified">M{ fmt.Sprintf("%d", len(c.ModifiedFiles)) }</span>
-			}
-			if len(c.DeletedFiles) > 0 {
-				<span class="files-deleted">-{ fmt.Sprintf("%d", len(c.DeletedFiles)) }</span>
-			}
-		</div>
 	</div>
 }

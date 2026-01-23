@@ -10,5 +10,6 @@ run: build
 	./portsMaster
 
 clean:
-	rm -rf public/*
+	rm -rf ./public
+	rm -rf ./.cache
 	rm -f portsMaster

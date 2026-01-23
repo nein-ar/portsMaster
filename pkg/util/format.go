@@ -17,12 +17,11 @@ func FormatContributorTooltip(c *model.Contributor) string {
 			seen[n] = true
 		}
 	}
-	if len(validOthers) == 0 {
-		return c.Email
+	        if len(validOthers) == 0 {
+	                return c.Email
+	        }
+	        return fmt.Sprintf("aka: %s | %s", strings.Join(validOthers, ", "), c.Email)
 	}
-	return fmt.Sprintf("Previously: %s | %s", strings.Join(validOthers, ", "), c.Email)
-}
-
 func FormatBytes(b int64) string {
 	const unit = 1024
 	if b < unit {
@@ -47,14 +46,17 @@ func FormatDuration(sec int64) string {
 }
 
 func FormatUnix(ts int64) string {
-	if ts == 0 {
-		return "-"
-	}
-	return time.Unix(ts, 0).Format("2006-01-02 15:04")
+        if ts == 0 {
+                return "-"
+        }
+        return time.Unix(ts, 0).Format("2006-01-02 15:04")
 }
 
-func FormatFinishTime(start, dur int64) string {
-	if start == 0 {
+func FormatTime(t time.Time) string {
+        return t.Format("2006-01-02 15:04")
+}
+
+func FormatFinishTime(start, dur int64) string {	if start == 0 {
 		return "-"
 	}
 	return time.Unix(start+dur, 0).Format("2006-01-02 15:04")

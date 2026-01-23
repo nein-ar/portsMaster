@@ -9,181 +9,255 @@ import (
 
 templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 	@Layout("Statistics", data, cfg, currentPath) {
-		<div class="quick-links">
-			<h3>Quick Links</h3>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=updated:30d")) }>New Ports (last 30 days)</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=*&sort=updated")) }>Recently Updated</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:broken")) }>Build Failures</a>
-			<a href="#">Unmaintained</a>
-			<a href="#">RSS Feed</a>
+		<div class="breadcrumb">
+			<a href={ Href(currentPath, "/") }>home</a> / stats
 		</div>
 
-		<div class="section-header">Repository Metrics</div>
-		
-		<div class="dashboard-grid">
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=*")) } class="stat-box clickable">
-				<span class="stat-label">Total Ports</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.TotalPorts) }</span>
-			</a>
-			<div class="stat-box">
-				<span class="stat-label">Build Success</span>
-				if data.BuildStats.Total > 0 {
-					<span class="stat-value">{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Success)/float64(data.BuildStats.Total)*100) }</span>
-				} else {
-					<span class="stat-value">-</span>
-				}
-			</div>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:broken")) } class="stat-box clickable">
-				<span class="stat-label">Broken Ports</span>
-				<span class="stat-value status-broken">{ fmt.Sprintf("%d", data.BrokenCount) }</span>
-				if data.TotalPorts > 0 {
-					<div class="text-meta">{ fmt.Sprintf("%.1f%% of total", float64(data.BrokenCount)/float64(data.TotalPorts)*100) }</div>
-				}
-			</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:unmaintained")) } class="stat-box clickable">
-				<span class="stat-label">Unmaintained</span>
-				<span class="stat-value status-unmaintained" style="opacity: 1;">{ fmt.Sprintf("%d", data.UnmaintainedCount) }</span>
-				if data.TotalPorts > 0 {
-					<div class="text-meta">{ fmt.Sprintf("%.1f%% of total", float64(data.UnmaintainedCount)/float64(data.TotalPorts)*100) }</div>
-				}
-			</a>
-		</div>
-
-		<div class="two-col">
-			<div class="stats-left-col">
-				<div class="section-header">Category Distribution</div>
-				for _, c := range data.Categories {
-					if len(c.Ports) > 0 {
-						<a href={ templ.SafeURL(Href(currentPath, fmt.Sprintf("/categories/%s/index.html", c.Name))) } class="dist-row">
-							<span class="dist-label" style="width: 120px;">{ c.Name }</span>
-							<div class="dist-bar-bg">
-								<div class="dist-bar-fill" style={ fmt.Sprintf("width: %.1f%%;", float64(len(c.Ports))/float64(data.TotalPorts)*100) }></div>
-							</div>
-							<span class="dist-count">{ fmt.Sprintf("%d", len(c.Ports)) }</span>
-						</a>
-					}
-				}
-
-				<div class="section-header mt-30">License Distribution</div>
-				for l, count := range data.LicenseStats {
-					<div class="dist-row">
-						<span class="dist-label" style="width: 120px;">{ l }</span>
-						<div class="dist-bar-bg">
-							<div class="dist-bar-fill" style={ fmt.Sprintf("width: %.1f%%;", float64(count)/float64(data.TotalPorts)*100) }></div>
-						</div>
-						<span class="dist-count">{ fmt.Sprintf("%d", count) }</span>
-					</div>
-				}
-
-				<div class="section-header mt-30">Top Contributors</div>
-				<table>
-					<thead>
-						<tr>
-							<th>Author</th>
-							<th class="text-right">Commits</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, tc := range data.TopContributors {
-							<tr>
-								<td>
-									<a href={ templ.SafeURL(Href(currentPath, fmt.Sprintf("/search/index.html?q=author:\"%s\"", tc.Name))) }
-									   class="text-bold"
-									   title={ util.FormatContributorTooltip(tc) }>
-										{ tc.Name }
-									</a>
-								</td>
-								<td class="text-right">
-									if data.TotalCommits > 0 {
-										<span class="text-meta mr-5">
-											{ fmt.Sprintf("%.1f%%", float64(tc.Count)/float64(data.TotalCommits)*100) }
-										</span>
-									}
-									{ fmt.Sprintf("%d", tc.Count) }
-								</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-			</div>
-
-			<div class="stats-right-col">
-				<div class="section-header">Commit Activity</div>
-				<div class="activity-chart-container">
-					<div class="activity-chart">
-						for _, day := range data.DailyStats {
-							<div title={ fmt.Sprintf("%s: %d commits", day.Date, day.Count) } 
-								 class="activity-bar"
-								 style={ fmt.Sprintf("height: %d%%;", util.Min(100, (day.Count * 100 / data.MaxDailyCommits))) }>
-							</div>
+		<div class="main-content">
+			<div class="section-header">Repository Dashboard</div>
+			
+			<div class="dashboard-grid">
+				<a href={ Href(currentPath, "/search/index.html?q=*") } class="stat-box clickable">
+					<span class="stat-label">Total Ports</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.TotalPorts) }</span>
+				</a>
+				<div class="stat-box">
+					<span class="stat-label">Categories</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", len(data.Categories)) }</span>
+				</div>
+				<a href={ Href(currentPath, "/search/index.html?q=is:updated") } class="stat-box clickable">
+					<span class="stat-label">Updated (7d)</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.UpdatedThisWeek) }</span>
+				</a>
+				<a href={ Href(currentPath, "/search/index.html?q=is:new") } class="stat-box clickable">
+					<span class="stat-label">New Ports (30d)</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.NewPortsCount) }</span>
+				</a>
+				<div class="stat-box">
+					<span class="stat-label">Total Commits</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.TotalCommits) }</span>
+				</div>
+				<div class="stat-box">
+					<span class="stat-label">Build Success</span>
+					<div class="stat-value-container">
+						if data.BuildStats.Total > 0 {
+							<span class="stat-value status-ok">{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Success)/float64(data.BuildStats.Total)*100) }</span>
+						} else {
+							<span class="stat-value">-</span>
 						}
 					</div>
 				</div>
-
-				<div class="section-header mt-30">Complexity (Longest Recipes)</div>
-				<p class="text-meta mb-10">
-					Lines in ndmake.sh. Total: { fmt.Sprintf("%d", data.TotalRecipeLines) }.
-					if data.Top5LinePercentage > 0 {
-						Top 5: { fmt.Sprintf("%.1f%%", data.Top5LinePercentage) }.
-					}
-				</p>
-				<table>
-					<thead>
-						<tr>
-							<th>Port</th>
-							<th class="text-right">Lines</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, p := range data.TopRecipes {
-							if p.RecipeLines > 0 {
-								<tr>
-									<td><a href={ templ.SafeURL(Href(currentPath, fmt.Sprintf("/ports/%s/%s/index.html", p.Category, p.Name))) }>{ p.Name }</a></td>
-									<td class="text-right">{ fmt.Sprintf("%d", p.RecipeLines) }</td>
-								</tr>
-							}
+				<a href={ Href(currentPath, "/search/index.html?q=is:broken") } class="stat-box clickable">
+					<span class="stat-label">Broken Ports</span>
+					<div class="stat-value-container">
+						if data.TotalPorts > 0 {
+							<span class="text-meta mr-5">{ fmt.Sprintf("%.1f%%", float64(data.BrokenCount)/float64(data.TotalPorts)*100) }</span>
 						}
-					</tbody>
-				</table>
+						<span class="stat-value status-broken">{ fmt.Sprintf("%d", data.BrokenCount) }</span>
+					</div>
+				</a>
+				<a href={ Href(currentPath, "/search/index.html?q=is:unmaintained") } class="stat-box clickable">
+					<span class="stat-label">Unmaintained</span>
+					<div class="stat-value-container">
+						if data.TotalPorts > 0 {
+							<span class="text-meta mr-5">{ fmt.Sprintf("%.1f%%", float64(data.UnmaintainedCount)/float64(data.TotalPorts)*100) }</span>
+						}
+						<span class="stat-value status-unmaintained opacity-1">{ fmt.Sprintf("%d", data.UnmaintainedCount) }</span>
+					</div>
+				</a>
+			</div>
 
-				if len(data.TopSizes) > 0 {
-					<div class="section-header mt-30">Largest Packages</div>
+			<div class="two-col">
+				<div class="stats-left">
+					<div class="section-header">Category Distribution</div>
 					<table>
 						<thead>
 							<tr>
-								<th>Port</th>
-								<th class="text-right">Size</th>
+								<th>Category</th>
+								<th class="text-right">Count</th>
+								<th>Distribution</th>
 							</tr>
 						</thead>
 						<tbody>
-							for _, p := range data.TopSizes {
+							for _, c := range data.Categories {
+								if len(c.Ports) > 0 {
+									<tr>
+										<td><a href={ Href(currentPath, fmt.Sprintf("/categories/%s/index.html", c.Name)) }>{ c.Name }</a></td>
+										<td class="text-right">
+											<span class="text-meta mr-5">
+												{ fmt.Sprintf("%.1f%%", float64(len(c.Ports))/float64(data.TotalPorts)*100) }
+											</span>
+											{ fmt.Sprintf("%d", len(c.Ports)) }
+										</td>
+										<td class="w-100p">
+											<div class="dist-bar-bg m-0">
+												<div class="dist-bar-fill js-width-bar" data-width={ fmt.Sprintf("%.1f%%", float64(len(c.Ports))/float64(data.TotalPorts)*100) }></div>
+											</div>
+										</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+
+					<div class="section-header mt-30">License Distribution</div>
+					<table>
+						<thead>
+							<tr>
+								<th>License</th>
+								<th class="text-right">Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							for l, count := range data.LicenseStats {
 								<tr>
-									<td><a href={ templ.SafeURL(Href(currentPath, fmt.Sprintf("/ports/%s/%s/index.html", p.Category, p.Name))) }>{ p.Name }</a></td>
-									<td class="text-right">{ util.FormatBytes(p.CI.Size) }</td>
+									<td>{ l }</td>
+									<td class="text-right">
+										<span class="text-meta mr-5">
+											{ fmt.Sprintf("%.1f%%", float64(count)/float64(data.TotalPorts)*100) }
+										</span>
+										{ fmt.Sprintf("%d", count) }
+									</td>
 								</tr>
 							}
 						</tbody>
 					</table>
-				}
 
-				if data.BuildStats.Total > 0 {
 					<div class="section-header mt-30">Build Statistics</div>
-					<div class="ci-data-box">
-						<div class="stat-row">
-							<span>Average Build Time</span>
-							<strong>{ util.FormatDuration(data.BuildStats.AvgTime) }</strong>
-						</div>
-						<div class="stat-row">
-							<span>Total Build Effort</span>
-							<strong>{ util.FormatDuration(data.BuildStats.TotalTime) }</strong>
-						</div>
-						<div class="stat-row">
-							<span>Success Rate</span>
-							<strong>{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Success)/float64(data.BuildStats.Total)*100) }</strong>
+					<table>
+						<tbody>
+							<tr>
+								<td>Successful Builds</td>
+								<td class="text-right">
+									if data.BuildStats.Total > 0 {
+										<span class="text-meta mr-5">
+											{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Success)/float64(data.BuildStats.Total)*100) }
+										</span>
+									}
+									<strong class="status-ok">{ fmt.Sprintf("%d", data.BuildStats.Success) }</strong>
+								</td>
+							</tr>
+							<tr>
+								<td>Failed Builds</td>
+								<td class="text-right">
+									if data.BuildStats.Total > 0 {
+										<span class="text-meta mr-5">
+											{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Failed)/float64(data.BuildStats.Total)*100) }
+										</span>
+									}
+									<strong class="status-broken">{ fmt.Sprintf("%d", data.BuildStats.Failed) }</strong>
+								</td>
+							</tr>
+							<tr>
+								<td>Total Builds Attempted</td>
+								<td class="text-right">
+									if data.TotalPorts > 0 {
+										<span class="text-meta mr-5">
+											{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Total)/float64(data.TotalPorts)*100) }
+										</span>
+									}
+									<strong>{ fmt.Sprintf("%d", data.BuildStats.Total) }</strong>
+								</td>
+							</tr>
+							if data.BuildStats.AvgTime > 0 {
+								<tr>
+									<td>Average Build Time</td>
+									<td class="text-right"><strong>{ util.FormatDuration(data.BuildStats.AvgTime) }</strong></td>
+								</tr>
+								<tr>
+									<td>Total Build Effort</td>
+									<td class="text-right"><strong>{ util.FormatDuration(data.BuildStats.TotalTime) }</strong></td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+
+				<div class="stats-right">
+					<div class="section-header">Commit Activity (History)</div>
+					<div class="activity-chart-container">
+						<div class="activity-chart">
+							for _, day := range data.DailyStats {
+								<div title={ fmt.Sprintf("%s: %d commits", day.Date, day.Count) } 
+									 class="activity-bar js-height-bar"
+									 data-height={ fmt.Sprintf("%d%%", util.Min(100, (day.Count * 100 / data.MaxDailyCommits))) }>
+								</div>
+							}
 						</div>
 					</div>
-				}
+					<p class="text-meta">Showing activity over time. Each bar represents one day.</p>
+
+					<div class="section-header mt-30">Top Contributors</div>
+					<table>
+						<thead>
+							<tr>
+								<th>Contributor</th>
+								<th class="text-right">Commits</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, tc := range data.TopContributors {
+								<tr>
+									<td>
+										<a href={ Href(currentPath, fmt.Sprintf("/search/index.html?q=author:\"%s\"", tc.Name)) }
+										   title={ util.FormatContributorTooltip(tc) }
+										   class="text-bold contributor-name">
+											{ tc.Name }
+										</a>
+									</td>
+									<td class="text-right">
+										if data.TotalCommits > 0 {
+											<span class="text-meta mr-5">
+												{ fmt.Sprintf("%.1f%%", float64(tc.Count)/float64(data.TotalCommits)*100) }
+											</span>
+										}
+										{ fmt.Sprintf("%d", tc.Count) }
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+
+					<div class="section-header mt-30">Recipe Complexity</div>
+					<p class="text-meta">
+						Lines in build scripts. Total: { fmt.Sprintf("%d", data.TotalRecipeLines) }.
+						if data.Top5LinePercentage > 0 {
+							Top 5: { fmt.Sprintf("%.1f%%", data.Top5LinePercentage) }.
+						}
+					</p>
+					<table>
+						<thead>
+							<tr>
+								<th>Port</th>
+								<th class="text-right">Lines</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, p := range data.TopRecipes {
+								if p.RecipeLines > 0 {
+									<tr>
+										<td><a href={ Href(currentPath, fmt.Sprintf("/ports/%s/%s/index.html", p.Category, p.Name)) }>{ p.Name }</a></td>
+										<td class="text-right">
+											<span class="text-meta mr-5">
+												{ fmt.Sprintf("%.1f%%", float64(p.RecipeLines)/float64(data.TotalRecipeLines)*100) }
+											</span>
+											{ fmt.Sprintf("%d", p.RecipeLines) }
+										</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<div class="stats-footer mt-30">
+				<p class="text-meta">Last updated: { util.FormatTime(data.LastUpdate) }</p>
 			</div>
 		</div>
+		<script>
+			// In addition to app.js, we can trigger it here if needed, 
+			// but app.js on DOMContentLoaded should handle it.
+		</script>
 	}
 }

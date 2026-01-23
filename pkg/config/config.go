@@ -9,16 +9,28 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
+// NavLink represents a link in the navigation menu.
+type NavLink struct {
+	Text string `toml:"text"`
+	URL  string `toml:"url"`
+}
+
 // Config holds all site generation and server settings.
 type Config struct {
-	Title         string `toml:"title"`
-	Description   string `toml:"description"`
-	Domain        string `toml:"domain"`
-	FooterText    string `toml:"footer_text"`
-	FooterURL     string `toml:"footer_url"`
-	BaseURL       string `toml:"base_url"`
-	SourceCodeURL string `toml:"source_code_url"`
-	Favicon       string `toml:"favicon"`
+	Title          string `toml:"title"`
+	Description    string `toml:"description"`
+	HeaderTitle    string `toml:"header_title"`
+	HeaderPrefix   string `toml:"header_prefix"`
+	Subtitle       string `toml:"subtitle"`
+	SubtitlePrefix string `toml:"subtitle_prefix"`
+	Domain         string `toml:"domain"`
+	FooterText     string `toml:"footer_text"`
+	FooterURL      string `toml:"footer_url"`
+	BaseURL        string `toml:"base_url"`
+	SourceCodeURL  string `toml:"source_code_url"`
+	Favicon        string `toml:"favicon"`
+
+	NavLinks []NavLink `toml:"nav_links"`
 
 	PortsPath string `toml:"ports_path"`
 	OutDir    string `toml:"out_dir"`

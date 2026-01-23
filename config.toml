@@ -1,6 +1,10 @@
 title = "DeriveLinux Ports"
 description = "THE LAST PUNK DISTRO"
-footer_text = "The DeriveLinux Quality Larping Center"
+header_title = "DeriveLinux Ports"
+header_prefix = "$ "
+subtitle = "THE LAST PUNK DISTRO"
+subtitle_prefix = "# "
+footer_text = "DeriveLinux Ports"
 source_code_url = "https://codeberg.org/derivelinux/ports"
 domain = "ports.derivelinux.nein.ar"
 
@@ -11,7 +15,7 @@ cache_dir = "./.cache"
 assets_dir = "./assets"
 
 # Runtime
-port = 8080
+port = 1313
 verbose = true
 serve = false
 watch = false
@@ -25,3 +29,23 @@ fortunes = "fortunes.txt"
 ci_status = "./ci-pkgs/ci_status.json"
 pkg_root = "./ci-pkgs/pkg"
 log_root = "./ci-pkgs/logs"
+
+[[nav_links]]
+text = "Home"
+url = "/"
+
+[[nav_links]]
+text = "Categories"
+url = "/categories"
+
+[[nav_links]]
+text = "Recent Commits"
+url = "/commits"
+
+[[nav_links]]
+text = "Search"
+url = "/search"
+
+[[nav_links]]
+text = "Statistics"
+url = "/stats"

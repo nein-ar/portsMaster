@@ -22,6 +22,7 @@ templ Header(title string, cfg *config.Config, currentPath string) {
 		for _, css := range cfg.ExtraCSS {
 			<link rel="stylesheet" href={ Href(currentPath, cfg.AssetURL(css)) }/>
 		}
+		<script src={ Href(currentPath, "/assets/app.js") }></script>
 		for _, js := range cfg.ExtraJS {
 			<script src={ Href(currentPath, cfg.AssetURL(js)) }></script>
 		}
@@ -30,16 +31,14 @@ templ Header(title string, cfg *config.Config, currentPath string) {
 
 templ Nav(cfg *config.Config, currentPath string) {
 	<header>
-		<h1>{ cfg.Title }</h1>
-		<p>{ cfg.Description }</p>
+		<h1>{ cfg.HeaderTitle }</h1>
+		<p>{ cfg.Subtitle }</p>
 	</header>
 
 	<nav>
-		<a href={ Href(currentPath, "/") }>Home</a>
-		<a href={ Href(currentPath, "/categories") }>Categories</a>
-		<a href={ Href(currentPath, "/commits") }>Recent Commits</a>
-		<a href={ Href(currentPath, "/search") }>Search</a>
-		<a href={ Href(currentPath, "/stats") }>Statistics</a>
+		for _, link := range cfg.NavLinks {
+			<a href={ Href(currentPath, link.URL) }>{ link.Text }</a>
+		}
 	</nav>
 }
 
@@ -52,10 +51,8 @@ templ FortuneBox() {
 
 templ Footer(cfg *config.Config, currentPath string) {
 	<footer>
-		<div class="footer-content">
-			<p>{ cfg.FooterText }: <a href={ templ.SafeURL(cfg.SourceCodeURL) }>{ strings.TrimPrefix(strings.TrimPrefix(cfg.SourceCodeURL, "https://"), "http://") }</a></p>
-			<p>Report issues on the tracker. Verify all checksums. Build from source.</p>
-		</div>
+		{ cfg.FooterText } - Source: <a href={ templ.SafeURL(cfg.SourceCodeURL) }>{ strings.TrimPrefix(strings.TrimPrefix(cfg.SourceCodeURL, "https://"), "http://") }</a><br/>
+		Report issues on the tracker. Verify all checksums. Build from source.
 	</footer>
 }
 

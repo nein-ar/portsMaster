@@ -19,11 +19,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 const randomIndex = Math.floor(Math.random() * fortunes.length);
                 fortuneText.textContent = fortunes[randomIndex];
             } else {
-                fortuneBox.style.display = 'none';
+                fortuneBox.classList.add('display-none');
             }
         })
         .catch(e => {
             console.error("Error loading fortunes:", e);
-            fortuneBox.style.display = 'none';
+            fortuneBox.classList.add('display-none');
         });
 });

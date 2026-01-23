@@ -102,6 +102,7 @@ func (c *Collector) PrepareSiteData(db *model.Database) *model.SiteData {
 	}
 
 	weekAgo := time.Now().AddDate(0, 0, -7)
+	monthAgo := time.Now().AddDate(0, 0, -30)
 	for _, p := range db.Ports {
 		data.PortMap[p.Category+"/"+p.Name] = p
 		if _, exists := data.SimplePortMap[p.Name]; !exists {
@@ -127,6 +128,15 @@ func (c *Collector) PrepareSiteData(db *model.Database) *model.SiteData {
 				data.UpdatedThisWeek++
 			}
 		}
+
+		// A port is considered "new" if its oldest commit is within the last 30 days
+		if len(p.Commits) > 0 {
+			oldest := p.Commits[len(p.Commits)-1].Date
+			if oldest.After(monthAgo) {
+				data.NewPortsCount++
+			}
+		}
+
 		if p.License != "" {
 			for _, l := range strings.Split(p.License, ",") {
 				data.LicenseStats[strings.TrimSpace(l)]++

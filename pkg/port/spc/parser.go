@@ -64,8 +64,11 @@ func (pr *Parser) Parse(category, name string) (*model.Port, error) {
 	}
 
 	p.Upstream = ExpandVariables(p.Upstream, map[string]string{
-		"VERSION": p.Version,
-		"NAME":    p.Name,
+		"VERSION":     p.Version,
+		"NAME":        p.Name,
+		"COMMIT":      p.Version, // Often commit is the version
+		"RELEASE":     p.Release,
+		"RELEASE_TAG": p.Release,
 	})
 
 	recipePath := filepath.Join(path, "ndmake.sh")

@@ -93,6 +93,7 @@ type SiteData struct {
 	BrokenCount       int
 	UnmaintainedCount int
 	UpdatedThisWeek   int
+	NewPortsCount     int
 	AllAuthors        []string
 	AllTimeframes     []string
 

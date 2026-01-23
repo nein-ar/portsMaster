@@ -7,7 +7,7 @@ import (
 // SearchForm renders the search input, category select, and optionally license select.
 templ SearchForm(data *model.SiteData, currentPath string, formID, inputID, selectID string, showAdvanced bool) {
 	<form class="search-box" action={ Href(currentPath, "/search/index.html") } method="GET" id={ formID }>
-		<input type="text" name="q" placeholder="search ports" id={ inputID }/>
+		<input type="text" name="q" placeholder="search ports..." id={ inputID }/>
 		
 		<select name="cat" id={ selectID }>
 			<option value="">all categories</option>
@@ -29,4 +29,19 @@ templ SearchForm(data *model.SiteData, currentPath string, formID, inputID, sele
 
 		<input type="submit" value="search"/>
 	</form>
+}
+
+templ CIStatusIndicator(p *model.Port) {
+        if p.CI != nil {
+                switch p.CI.Status {
+                        case "success":
+                                <span class="status-dot success" title="Build Succeeded"></span>
+                        case "failed":
+                                <span class="status-dot failed" title="Build Failed"></span>
+                        default:
+                                <span class="status-dot none" title={ p.CI.Status }></span>
+                }
+        } else {
+                <span class="status-dot none" title="No CI data"></span>
+        }
 }

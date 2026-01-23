@@ -113,7 +113,7 @@ templ PortDetail(data *model.SiteData, p *model.Port, cfg *config.Config, curren
 									case "failed":
 										<strong class="status-broken">FAILED</strong>
 									default:
-										<strong style="color: orange;">{ strings.ToUpper(p.CI.Status) }</strong>
+										<strong class="status-orange">{ strings.ToUpper(p.CI.Status) }</strong>
 								}
 								if p.CI.BuildLog != "" {
 									<a href={ templ.SafeURL(p.CI.BuildLog) } class="ml-10 text-tiny" target="_blank">[LOG]</a>
@@ -125,8 +125,22 @@ templ PortDetail(data *model.SiteData, p *model.Port, cfg *config.Config, curren
 							<strong>{ util.FormatDuration(p.CI.BuildDuration) }</strong>
 						</div>
 						<div class="stat-row">
-							<span>Built At</span>
-							<strong>{ util.FormatUnix(p.CI.BuildStarted) }</strong>
+							<span>Global Share (Commits)</span>
+							<div class="flex-center">
+								if data.TotalCommits > 0 {
+									<span class="text-meta mr-5">{ fmt.Sprintf("%.2f%%", float64(len(p.Commits))/float64(data.TotalCommits)*100) }</span>
+								}
+								<strong>{ fmt.Sprintf("%d", len(p.Commits)) }</strong>
+							</div>
+						</div>
+						<div class="stat-row">
+							<span>Global Share (Lines)</span>
+							<div class="flex-center">
+								if data.TotalRecipeLines > 0 {
+									<span class="text-meta mr-5">{ fmt.Sprintf("%.2f%%", float64(p.RecipeLines)/float64(data.TotalRecipeLines)*100) }</span>
+								}
+								<strong>{ fmt.Sprintf("%d", p.RecipeLines) }</strong>
+							</div>
 						</div>
 						<div class="stat-row">
 							<span>Package Size</span>
@@ -162,28 +176,33 @@ templ CategoryDetail(data *model.SiteData, c *model.Category, cfg *config.Config
 		<p>{ util.Plural(len(c.Ports), "port") }</p>
 		
 		<table>
-			<thead>
-				<tr>
-					<th>Port</th>
-					<th>Version</th>
-					<th>Description</th>
-					<th>Updated</th>
-				</tr>
-			</thead>
-			<tbody>
-				for _, p := range c.Ports {
-					<tr>
-						<td><a href={ templ.SafeURL(Href(currentPath, "/ports/"+p.Category+"/"+p.Name)) } class="port-name">{ p.Name }</a></td>
-						<td class="version">{ p.Version }</td>
-						<td>{ p.Description }</td>
-						if p.LastCommit != nil {
-							<td class="updated-recent">{ util.FormatTimeAgo(p.LastCommit.Date) }</td>
-						} else {
-							<td>-</td>
-						}
-					</tr>
-				}
-			</tbody>
+                       <thead>
+                               <tr>
+                                       <th>Port</th>
+                                       <th>Version</th>
+                                       <th>Description</th>
+                                       <th>Updated</th>
+                               </tr>
+                       </thead>
+                       <tbody>
+                               for _, p := range c.Ports {
+                                       <tr>
+                                               <td>
+                                                       <div class="flex-center">
+                                                               @CIStatusIndicator(p)
+                                                               <a href={ templ.SafeURL(Href(currentPath, "/ports/"+p.Category+"/"+p.Name+"/index.html")) } class="port-name">{ p.Name }</a>
+                                                       </div>
+                                               </td>
+                                               <td class="version">{ p.Version }</td>
+                                               <td>{ p.Description }</td>
+                                               if p.LastCommit != nil {
+                                                       <td>{ util.FormatTime(p.LastCommit.Date) }</td>
+                                               } else {
+                                                       <td>-</td>
+                                               }
+                                       </tr>
+                               }
+                       </tbody>
 		</table>
 	}
 }
