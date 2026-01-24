@@ -21,7 +21,7 @@ serve = false
 watch = false
 
 # Assets Configuration
-extra_css = ["styles.css"]
+extra_css = ["derive_red.css", "styles.css"] #extra_css = ["theme_default.css", "styles.css"]
 extra_js = ["search.js", "commits.js", "fortunes.js"]
 fortunes = "fortunes.txt"
 

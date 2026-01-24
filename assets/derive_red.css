@@ -1,0 +1,80 @@
+:root {
+  --bg: #0f0202;
+  --text: #CD5F57;
+  --text-muted: #CD5F57;
+  --text-dim: #CD5F57;
+  --text-dark: #0f0202;
+  --link: #CD5F57;
+  --link-visited: #CD5F57;
+  
+  --header-bg: #5A3A37;
+  --header-border: #52201C;
+  
+  --nav-bg: #52201C;
+  --nav-border: #5A3A37;
+  
+  --search-bg: #0f0202;
+  --search-border: #5A3A37;
+  --input-bg: #52201C;
+  --input-border: #5A3A37;
+  --btn-bg: #5A3A37;
+  --btn-border: #52201C;
+  --btn-hover-bg: #CD5F57;
+  
+  --stats-bg: #0f0202;
+  --stats-border: #52201C;
+  
+  --table-bg: #0f0202;
+  --table-header-bg: #5A3A37;
+  --table-border: #52201C;
+  --table-border-light: #52201C;
+  --table-hover: #52201C;
+  
+  --commit-border: #52201C;
+  --commit-hash-bg: #52201C;
+  
+  --footer-bg: #5A3A37;
+  --footer-border: #52201C;
+  
+  --box-bg: #0f0202;
+  --box-border: #5A3A37;
+  --box-shadow: #52201C;
+  
+  --bar-bg: #52201C;
+  --bar-fill: #CD5F57;
+  
+  --chart-bg: #0f0202;
+  --chart-bar: #CD5F57;
+  --chart-bar-hover: #5A3A37;
+  
+  --highlight: #5A3A37;
+  
+  --status-ok: #CD5F57;
+  --status-err: #CD5F57;
+  --status-unmaintained: #CD5F57;
+}
+
+/* Adjustments for dark theme visibility */
+a:visited {
+  opacity: 0.8;
+}
+
+header p {
+  opacity: 0.9;
+}
+
+.version {
+  opacity: 0.8;
+}
+
+.commit-msg {
+  opacity: 0.9;
+}
+
+.text-meta {
+  opacity: 0.7;
+}
+
+.status-unmaintained {
+  opacity: 0.5;
+}
