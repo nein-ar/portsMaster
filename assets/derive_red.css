@@ -1,80 +1,183 @@
 :root {
   --bg: #0f0202;
-  --text: #CD5F57;
-  --text-muted: #CD5F57;
-  --text-dim: #CD5F57;
+  --surface: #52201C;
+  --surface-alt: #5A3A37;
+
+  --text: rgba(205, 95, 87, 0.92);
+  --text-muted: rgba(205, 95, 87, 0.70);
+  --text-dim: rgba(205, 95, 87, 0.50);
   --text-dark: #0f0202;
+
   --link: #CD5F57;
-  --link-visited: #CD5F57;
-  
+  --link-visited: rgba(205, 95, 87, 0.75);
+
   --header-bg: #5A3A37;
-  --header-border: #52201C;
-  
+  --header-border: rgba(0, 0, 0, 0.4);
+
   --nav-bg: #52201C;
-  --nav-border: #5A3A37;
-  
+  --nav-border: rgba(0, 0, 0, 0.4);
+
   --search-bg: #0f0202;
-  --search-border: #5A3A37;
+  --search-border: rgba(205, 95, 87, 0.25);
+
   --input-bg: #52201C;
-  --input-border: #5A3A37;
+  --input-border: rgba(205, 95, 87, 0.35);
+
   --btn-bg: #5A3A37;
-  --btn-border: #52201C;
+  --btn-border: rgba(0, 0, 0, 0.4);
   --btn-hover-bg: #CD5F57;
-  
+  --btn-hover-text: #0f0202;
+
   --stats-bg: #0f0202;
-  --stats-border: #52201C;
-  
+  --stats-border: rgba(205, 95, 87, 0.25);
+
   --table-bg: #0f0202;
   --table-header-bg: #5A3A37;
-  --table-border: #52201C;
-  --table-border-light: #52201C;
-  --table-hover: #52201C;
-  
-  --commit-border: #52201C;
-  --commit-hash-bg: #52201C;
-  
+  --table-border: rgba(205, 95, 87, 0.25);
+  --table-border-light: rgba(205, 95, 87, 0.15);
+  --table-hover: rgba(205, 95, 87, 0.08);
+
+  --box-bg: #52201C;
+  --box-border: rgba(0, 0, 0, 0.4);
+  --box-shadow: rgba(0, 0, 0, 0.6);
+
+  --commit-border: rgba(205, 95, 87, 0.25);
+  --commit-hash-bg: rgba(205, 95, 87, 0.15);
+
   --footer-bg: #5A3A37;
-  --footer-border: #52201C;
-  
-  --box-bg: #0f0202;
-  --box-border: #5A3A37;
-  --box-shadow: #52201C;
-  
-  --bar-bg: #52201C;
+  --footer-border: rgba(0, 0, 0, 0.4);
+
+  --bar-bg: rgba(205, 95, 87, 0.15);
   --bar-fill: #CD5F57;
-  
+
   --chart-bg: #0f0202;
   --chart-bar: #CD5F57;
   --chart-bar-hover: #5A3A37;
-  
-  --highlight: #5A3A37;
-  
-  --status-ok: #CD5F57;
+
+  --highlight: rgba(205, 95, 87, 0.20);
+
+  --status-ok: rgba(205, 95, 87, 0.85);
   --status-err: #CD5F57;
-  --status-unmaintained: #CD5F57;
+  --status-unmaintained: rgba(205, 95, 87, 0.45);
 }
 
-/* Adjustments for dark theme visibility */
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--link);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 a:visited {
-  opacity: 0.8;
+  color: var(--link-visited);
 }
 
-header p {
-  opacity: 0.9;
+a:hover {
+  text-decoration: underline;
 }
 
-.version {
-  opacity: 0.8;
+header {
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
 }
 
-.commit-msg {
-  opacity: 0.9;
+nav {
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
 }
 
+input,
+select {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+}
+
+button {
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 1px solid var(--btn-border);
+}
+
+button:hover {
+  background: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
+}
+
+.stats,
+.info-bar {
+  background: var(--stats-bg);
+  border: 1px solid var(--stats-border);
+}
+
+table {
+  background: var(--table-bg);
+  border-collapse: collapse;
+}
+
+th {
+  background: var(--table-header-bg);
+  color: var(--text);
+  border-bottom: 1px solid var(--table-border);
+}
+
+td {
+  border-bottom: 1px solid var(--table-border-light);
+}
+
+tr:hover {
+  background: var(--table-hover);
+}
+
+.box,
+.panel {
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  box-shadow: 0 2px 4px var(--box-shadow);
+}
+
+.commit {
+  border-bottom: 1px solid var(--commit-border);
+}
+
+.commit-hash {
+  background: var(--commit-hash-bg);
+}
+
+footer {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--footer-border);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-dim,
 .text-meta {
-  opacity: 0.7;
+  color: var(--text-dim);
 }
-
+.status-ok {
+  color: var(--status-ok);
+}
+.status-err {
+  color: var(--status-err);
+  font-weight: 700;
+}
 .status-unmaintained {
-  opacity: 0.5;
+  color: var(--status-unmaintained);
+}
+.bar {
+  background: var(--bar-bg);
+}
+.bar-fill {
+  background: var(--bar-fill);
+}
+.version,
+.commit-msg {
+  color: var(--text-muted);
 }
