@@ -1,183 +1,65 @@
 :root {
-  --bg: #0f0202;
-  --surface: #52201C;
-  --surface-alt: #5A3A37;
+  --bg: #0a0000;
+  --text: #f5d4d2;
+  --text-muted: #d9a8a5;
+  --text-dim: #b88683;
+  --text-dark: #d3a6a6;
+  --link: #ffc9c5;
+  --link-visited: #d9a8a5;
 
-  --text: rgba(205, 95, 87, 0.92);
-  --text-muted: rgba(205, 95, 87, 0.70);
-  --text-dim: rgba(205, 95, 87, 0.50);
-  --text-dark: #0f0202;
-
-  --link: #CD5F57;
-  --link-visited: rgba(205, 95, 87, 0.75);
-
-  --header-bg: #5A3A37;
-  --header-border: rgba(0, 0, 0, 0.4);
+  /* Structural elements */
+  --header-bg: #1a0505;
+  --header-border: #ff6b63;
 
   --nav-bg: #52201C;
-  --nav-border: rgba(0, 0, 0, 0.4);
+  --nav-border: #ff6b63;
 
-  --search-bg: #0f0202;
-  --search-border: rgba(205, 95, 87, 0.25);
+  /* Interactive elements */
+  --search-bg: #1a0505;
+  --search-border: #d94d45;
+  --input-bg: #2a0808;
+  --input-border: #ff6b63;
+  --btn-bg: #52201C;
+  --btn-border: #ff6b63;
+  --btn-hover-bg: #ff6b63;
 
-  --input-bg: #52201C;
-  --input-border: rgba(205, 95, 87, 0.35);
+  /* Stats and data */
+  --stats-bg: #0a0000;
+  --stats-border: #d94d45;
 
-  --btn-bg: #5A3A37;
-  --btn-border: rgba(0, 0, 0, 0.4);
-  --btn-hover-bg: #CD5F57;
-  --btn-hover-text: #0f0202;
+  /* Tables */
+  --table-bg: #0a0000;
+  --table-header-bg: #52201C;
+  --table-border: #d94d45;
+  --table-border-light: #5A3A37;
+  --table-hover: #2a0808;
 
-  --stats-bg: #0f0202;
-  --stats-border: rgba(205, 95, 87, 0.25);
+  /* Code/commits */
+  --commit-border: #d94d45;
+  --commit-hash-bg: #2a0808;
 
-  --table-bg: #0f0202;
-  --table-header-bg: #5A3A37;
-  --table-border: rgba(205, 95, 87, 0.25);
-  --table-border-light: rgba(205, 95, 87, 0.15);
-  --table-hover: rgba(205, 95, 87, 0.08);
+  /* Footer */
+  --footer-bg: #52201C;
+  --footer-border: #ff6b63;
 
-  --box-bg: #52201C;
-  --box-border: rgba(0, 0, 0, 0.4);
-  --box-shadow: rgba(0, 0, 0, 0.6);
+  /* Boxes and containers */
+  --box-bg: #1a0505;
+  --box-border: #d94d45;
+  --box-shadow: rgba(255, 107, 99, 0.2);
 
-  --commit-border: rgba(205, 95, 87, 0.25);
-  --commit-hash-bg: rgba(205, 95, 87, 0.15);
+  /* Progress/charts */
+  --bar-bg: #2a0808;
+  --bar-fill: #ff6b63;
 
-  --footer-bg: #5A3A37;
-  --footer-border: rgba(0, 0, 0, 0.4);
+  --chart-bg: #0a0000;
+  --chart-bar: #ff6b63;
+  --chart-bar-hover: #ff8278;
 
-  --bar-bg: rgba(205, 95, 87, 0.15);
-  --bar-fill: #CD5F57;
+  --highlight: #ff6b6333;
 
-  --chart-bg: #0f0202;
-  --chart-bar: #CD5F57;
-  --chart-bar-hover: #5A3A37;
-
-  --highlight: rgba(205, 95, 87, 0.20);
-
-  --status-ok: rgba(205, 95, 87, 0.85);
-  --status-err: #CD5F57;
-  --status-unmaintained: rgba(205, 95, 87, 0.45);
+  /* Status indicators */
+  --status-ok: #ff6b63;
+  --status-err: #ff3b33;
+  --status-unmaintained: #a33a34;
 }
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
-}
-
-a {
-  color: var(--link);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-a:visited {
-  color: var(--link-visited);
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-header {
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--header-border);
-}
-
-nav {
-  background: var(--nav-bg);
-  border-bottom: 1px solid var(--nav-border);
-}
-
-input,
-select {
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-}
-
-button {
-  background: var(--btn-bg);
-  color: var(--text);
-  border: 1px solid var(--btn-border);
-}
-
-button:hover {
-  background: var(--btn-hover-bg);
-  color: var(--btn-hover-text);
-}
-
-.stats,
-.info-bar {
-  background: var(--stats-bg);
-  border: 1px solid var(--stats-border);
-}
-
-table {
-  background: var(--table-bg);
-  border-collapse: collapse;
-}
-
-th {
-  background: var(--table-header-bg);
-  color: var(--text);
-  border-bottom: 1px solid var(--table-border);
-}
-
-td {
-  border-bottom: 1px solid var(--table-border-light);
-}
-
-tr:hover {
-  background: var(--table-hover);
-}
-
-.box,
-.panel {
-  background: var(--box-bg);
-  border: 1px solid var(--box-border);
-  box-shadow: 0 2px 4px var(--box-shadow);
-}
-
-.commit {
-  border-bottom: 1px solid var(--commit-border);
-}
-
-.commit-hash {
-  background: var(--commit-hash-bg);
-}
-
-footer {
-  background: var(--footer-bg);
-  border-top: 1px solid var(--footer-border);
-}
-
-.text-muted {
-  color: var(--text-muted);
-}
-
-.text-dim,
-.text-meta {
-  color: var(--text-dim);
-}
-.status-ok {
-  color: var(--status-ok);
-}
-.status-err {
-  color: var(--status-err);
-  font-weight: 700;
-}
-.status-unmaintained {
-  color: var(--status-unmaintained);
-}
-.bar {
-  background: var(--bar-bg);
-}
-.bar-fill {
-  background: var(--bar-fill);
-}
-.version,
-.commit-msg {
-  color: var(--text-muted);
-}
