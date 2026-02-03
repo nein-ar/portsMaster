@@ -17,6 +17,11 @@ func ScanPackages(reg *registry.Registry, ports []*model.Port) error {
 		return nil
 	}
 
+	// Check if PkgsRoot is remote (starts with http). If so, we can't scan it with os.ReadDir.
+	if len(pkgsRoot) > 4 && (pkgsRoot[:4] == "http" || pkgsRoot[:4] == "ftp:") {
+		return nil
+	}
+
 	portMap := make(map[string]*model.Port, len(ports))
 	for _, p := range ports {
 		portMap[p.Category+"/"+p.Name] = p

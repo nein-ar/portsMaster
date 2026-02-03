@@ -22,7 +22,7 @@ templ Header(title string, cfg *config.Config, currentPath string) {
 		for _, css := range cfg.ExtraCSS {
 			<link rel="stylesheet" href={ Href(currentPath, cfg.AssetURL(css)) }/>
 		}
-		<script src={ Href(currentPath, "/assets/app.js") }></script>
+		<script src={ Href(currentPath, cfg.AssetURL("app.js")) }></script>
 		for _, js := range cfg.ExtraJS {
 			<script src={ Href(currentPath, cfg.AssetURL(js)) }></script>
 		}

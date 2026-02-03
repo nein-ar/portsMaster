@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pelletier/go-toml/v2"
 )
@@ -147,6 +148,11 @@ func (c *Config) ParseFlags(args []string) (string, error) {
 	return configPath, nil
 }
 
+// IsRemote checks if a path is a remote URL.
+func IsRemote(path string) bool {
+	return len(path) > 4 && (path[:4] == "http" || path[:4] == "ftp:")
+}
+
 // Finalize resolves paths and sets derived values.
 func (c *Config) Finalize() {
 	if c.BaseURL == "/" {
@@ -157,6 +163,9 @@ func (c *Config) Finalize() {
 	}
 
 	expand := func(p string) string {
+		if IsRemote(p) {
+			return p
+		}
 		if len(p) > 0 && p[0] == '~' {
 			if home, err := os.UserHomeDir(); err == nil {
 				return filepath.Join(home, p[1:])
@@ -176,8 +185,11 @@ func (c *Config) Finalize() {
 
 // AssetURL returns a path relative to the site root for the given asset.
 func (c *Config) AssetURL(path string) string {
-	if len(path) > 0 && (path[0] == '/' || (len(path) > 4 && path[:4] == "http")) {
+	if IsRemote(path) || (len(path) > 0 && path[0] == '/') {
 		return path
+	}
+	if IsRemote(c.AssetsDir) {
+		return fmt.Sprintf("%s/%s", strings.TrimRight(c.AssetsDir, "/"), path)
 	}
 	return fmt.Sprintf("%s/assets/%s", c.BaseURL, path)
 }

@@ -16,12 +16,18 @@ type Registry struct {
 
 // New creates a new registry with the provided root paths.
 func New(ports, pkgs, logs, output, assets string) *Registry {
+	clean := func(p string) string {
+		if len(p) > 4 && (p[:4] == "http" || p[:4] == "ftp:") {
+			return p
+		}
+		return filepath.Clean(p)
+	}
 	return &Registry{
-		portsRoot:  filepath.Clean(ports),
-		pkgsRoot:   filepath.Clean(pkgs),
-		logsRoot:   filepath.Clean(logs),
-		outputRoot: filepath.Clean(output),
-		assetsRoot: filepath.Clean(assets),
+		portsRoot:  clean(ports),
+		pkgsRoot:   clean(pkgs),
+		logsRoot:   clean(logs),
+		outputRoot: clean(output),
+		assetsRoot: clean(assets),
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -212,6 +213,9 @@ func (e *Engine) exportJSON(path string, data interface{}, global string) {
 }
 
 func (e *Engine) syncAssets(global string) {
+	if config.IsRemote(e.cfg.AssetsDir) {
+		return
+	}
 	entries, _ := os.ReadDir(e.cfg.AssetsDir)
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -260,11 +264,28 @@ func (e *Engine) renderFortunes(global string) {
 	}
 
 	path := e.cfg.Fortunes
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(e.cfg.AssetsDir, path)
+	var content []byte
+	var err error
+
+	if config.IsRemote(path) {
+		resp, errGet := http.Get(path)
+		if errGet != nil {
+			fmt.Printf("warning: could not fetch fortunes from %s: %v\n", path, errGet)
+			return
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			fmt.Printf("warning: could not fetch fortunes from %s: %s\n", path, resp.Status)
+			return
+		}
+		content, err = io.ReadAll(resp.Body)
+	} else {
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(e.cfg.AssetsDir, path)
+		}
+		content, err = os.ReadFile(path)
 	}
 
-	content, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Printf("warning: could not read fortunes file %s: %v\n", path, err)
 		return
@@ -311,7 +332,9 @@ func (e *Engine) computeGlobalHash() string {
 }
 
 func (e *Engine) computeDataHash(d *model.SiteData) string {
-	return cache.HashString(fmt.Sprintf("%d-%d-%d", d.TotalPorts, d.BrokenCount, d.TotalCommits))
+	return cache.HashString(fmt.Sprintf("%d-%d-%d-%d-%d-%d", 
+		d.TotalPorts, d.BrokenCount, d.TotalCommits, 
+		d.BuildStats.Success, d.BuildStats.Failed, d.BuildStats.Total))
 }
 
 func (e *Engine) computePortHash(p *model.Port, global, data string, pm map[string]*model.Port) string {
@@ -324,6 +347,9 @@ func (e *Engine) computePortHash(p *model.Port, global, data string, pm map[stri
 	}
 	if p.LastCommit != nil {
 		h.Add(p.LastCommit.Hash)
+	}
+	if p.CI != nil {
+		h.Add(p.CI.Status + fmt.Sprintf("%d", p.CI.BuildStarted))
 	}
 	return h.Sum()
 }
