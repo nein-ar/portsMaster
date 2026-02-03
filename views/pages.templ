@@ -31,7 +31,7 @@ templ PortDetail(data *model.SiteData, p *model.Port, cfg *config.Config, curren
 			<div class="metadata-section">
 				<div class="section-header">Metadata</div>
 				<div class="port-info">
-					<p><strong>Maintainer:</strong> 
+					<p><strong>Maintainer:</strong>
 						if p.IsUnmaintained {
 							<span class="status-unmaintained">unmaintained</span>
 						} else {
@@ -43,7 +43,7 @@ templ PortDetail(data *model.SiteData, p *model.Port, cfg *config.Config, curren
 					}
 					<p><strong>Package Path:</strong> <code class="text-tiny">{ p.Category }/{ p.Name }</code></p>
 					if len(p.Provides) > 0 {
-						<p><strong>Provides:</strong> 
+						<p><strong>Provides:</strong>
 							for i, prov := range p.Provides {
 								<span class="text-bold">{ prov }</span>
 								if i < len(p.Provides)-1 {
@@ -174,7 +174,7 @@ templ CategoryDetail(data *model.SiteData, c *model.Category, cfg *config.Config
 	@Layout("Category: "+c.Name, data, cfg, currentPath) {
 		<div class="section-header">Category: { c.Name }</div>
 		<p>{ util.Plural(len(c.Ports), "port") }</p>
-		
+
 		<table>
                        <thead>
                                <tr>

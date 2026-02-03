@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (text.startsWith('cat:') || text.startsWith('category:')) match = p.c.toLowerCase() === text.substring(text.indexOf(':') + 1);
         else if (text.startsWith('dep:') || text.startsWith('depends:')) match = p.dps && p.dps.some(d => d.toLowerCase().includes(text.substring(text.indexOf(':') + 1)));
         else if (text.startsWith('provides:')) match = p.pds && p.pds.some(f => f.toLowerCase().includes(text.substring(9)));
-        else if (text === 'is:broken') match = p.br;
+        else if (text === 'is:broken') match = p.br || p.st === 'failed';
         else if (text === 'is:unmaintained') match = p.un;
         else if (text === 'is:new') {
             const thirtyDaysAgo = (Date.now() / 1000) - (30 * 86400000 / 1000);

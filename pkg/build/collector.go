@@ -127,7 +127,7 @@ func (c *Collector) PrepareSiteData(db *model.Database) *model.SiteData {
 
 		data.TotalRecipeLines += p.RecipeLines
 
-		if p.IsBroken {
+		if p.IsBroken || (p.CI != nil && p.CI.Status == "failed") {
 			data.BrokenCount++
 		}
 		if p.IsUnmaintained {

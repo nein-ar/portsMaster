@@ -27,7 +27,12 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 				</div>
 				<a href={ Href(currentPath, "/search/index.html?q=is:updated") } class="stat-box clickable">
 					<span class="stat-label">Updated (7d)</span>
-					<span class="stat-value">{ fmt.Sprintf("%d", data.UpdatedThisWeek) }</span>
+					<div class="stat-value-container">
+						if data.TotalPorts > 0 {
+							<span class="text-meta mr-5">{ fmt.Sprintf("%.1f%%", float64(data.UpdatedThisWeek)/float64(data.TotalPorts)*100) }</span>
+						}
+						<span class="stat-value">{ fmt.Sprintf("%d", data.UpdatedThisWeek) }</span>
+					</div>
 				</a>
 				<a href={ Href(currentPath, "/search/index.html?q=is:new") } class="stat-box clickable">
 					<span class="stat-label">New Ports (30d)</span>
