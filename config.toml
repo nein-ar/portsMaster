@@ -27,9 +27,9 @@ extra_js = ["search.js", "commits.js", "fortunes.js"]
 fortunes = "fortunes.txt"
 
 [metadata]
-ci_status = "../ci_status.json"
+ci_status = "https://pkg.derivelinux.org/ci_status.json"
 pkg_root = "https://pkg.derivelinux.org/pkg"
-log_root = "https://pkg.derivelinux.org/logs"
+log_root = "https://pkg.derivelinux.org" #log_root = "https://pkg.derivelinux.org/logs" # bc the ci_status file contains the `logs/` prefix already
 
 [[nav_links]]
 text = "Home"
