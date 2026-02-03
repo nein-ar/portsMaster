@@ -37,6 +37,7 @@ type Config struct {
 	OutDir    string `toml:"out_dir"`
 	CacheDir  string `toml:"cache_dir"`
 	AssetsDir string `toml:"assets_dir"`
+	CIStatus  string `toml:"ci_status"`
 
 	Metadata struct {
 		PkgsPath string `toml:"pkg_root"`
@@ -178,6 +179,7 @@ func (c *Config) Finalize() {
 	c.Metadata.PkgsPath = expand(c.Metadata.PkgsPath)
 	c.Metadata.LogsPath = expand(c.Metadata.LogsPath)
 	c.Metadata.CIStatus = expand(c.Metadata.CIStatus)
+	c.CIStatus = expand(c.CIStatus)
 	c.OutDir = expand(c.OutDir)
 	c.CacheDir = expand(c.CacheDir)
 	c.AssetsDir = expand(c.AssetsDir)

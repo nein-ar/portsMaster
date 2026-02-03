@@ -45,8 +45,13 @@ func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, met
 	}
 
 	ciData := make(map[string]*model.CIInfo)
-	if c.cfg.Metadata.CIStatus != "" {
-		if data, err := source.LoadCIStatus(c.cfg.Metadata.CIStatus); err == nil {
+	ciPath := c.cfg.CIStatus
+	if ciPath == "" {
+		ciPath = c.cfg.Metadata.CIStatus
+	}
+
+	if ciPath != "" {
+		if data, err := source.LoadCIStatus(ciPath); err == nil {
 			ciData = data
 		}
 	}
@@ -67,6 +72,12 @@ func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, met
 	for _, p := range ports {
 		if ci, ok := ciData[p.Category+"/"+p.Name]; ok {
 			p.CI = ci
+			// Prefix BuildLog with LogsPath if set.
+			// We check if BuildLog is already a remote URL or absolute path.
+			logsRoot := c.cfg.Metadata.LogsPath
+			if logsRoot != "" && p.CI.BuildLog != "" && !config.IsRemote(p.CI.BuildLog) && !strings.HasPrefix(p.CI.BuildLog, "/") {
+				p.CI.BuildLog = strings.TrimRight(logsRoot, "/") + "/" + p.CI.BuildLog
+			}
 		}
 		select {
 		case <-ctx.Done():

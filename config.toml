@@ -7,6 +7,7 @@ subtitle_prefix = "# "
 footer_text = "DeriveLinux Ports"
 source_code_url = "https://codeberg.org/derivelinux/ports"
 domain = "ports.derivelinux.nein.ar"
+favicon="favicon.png"
 
 # Paths
 ports_path = "./ports"
@@ -15,7 +16,7 @@ cache_dir = "./.cache"
 assets_dir = "./assets"
 
 # Runtime
-port = 1313
+port = 8080
 verbose = true
 serve = false
 watch = false
@@ -26,9 +27,9 @@ extra_js = ["search.js", "commits.js", "fortunes.js"]
 fortunes = "fortunes.txt"
 
 [metadata]
-ci_status = "./ci-pkgs/ci_status.json"
-pkg_root = "./ci-pkgs/pkg"
-log_root = "./ci-pkgs/logs"
+ci_status = "../ci_status.json"
+pkg_root = "https://pkg.derivelinux.org/pkg"
+log_root = "https://pkg.derivelinux.org/logs"
 
 [[nav_links]]
 text = "Home"
