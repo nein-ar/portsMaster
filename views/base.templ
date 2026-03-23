@@ -52,7 +52,7 @@ templ FortuneBox() {
 templ Footer(cfg *config.Config, currentPath string) {
 	<footer>
 		{ cfg.FooterText } - Source: <a href={ templ.SafeURL(cfg.SourceCodeURL) }>{ strings.TrimPrefix(strings.TrimPrefix(cfg.SourceCodeURL, "https://"), "http://") }</a><br/>
-		Report issues on the tracker. Verify all checksums. Build from source.
+		derive is public domain software. all software listed is under it's respective license.
 	</footer>
 }
 

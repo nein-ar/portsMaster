@@ -1,10 +1,10 @@
-title = "DeriveLinux Ports"
-description = "THE LAST PUNK DISTRO"
-header_title = "DeriveLinux Ports"
-header_prefix = "$ "
-subtitle = "THE LAST PUNK DISTRO"
+title = "dérive linux ports"
+description = "the operating situation"
+header_title = "dérive linux ports"
+header_prefix = ""
+subtitle = "the operating situation"
 subtitle_prefix = "# "
-footer_text = "DeriveLinux Ports"
+footer_text = "dérive linux ports"
 source_code_url = "https://codeberg.org/derivelinux/ports"
 domain = "ports.derivelinux.nein.ar"
 favicon="favicon.png"
@@ -32,21 +32,21 @@ pkg_root = "https://pkg.derivelinux.org/pkg"
 log_root = "https://pkg.derivelinux.org" #log_root = "https://pkg.derivelinux.org/logs" # bc the ci_status file contains the `logs/` prefix already
 
 [[nav_links]]
-text = "Home"
+text = "home"
 url = "/"
 
 [[nav_links]]
-text = "Categories"
+text = "categories"
 url = "/categories"
 
 [[nav_links]]
-text = "Recent Commits"
+text = "commits"
 url = "/commits"
 
 [[nav_links]]
-text = "Search"
+text = "search"
 url = "/search"
 
 [[nav_links]]
-text = "Statistics"
+text = "stats"
 url = "/stats"
