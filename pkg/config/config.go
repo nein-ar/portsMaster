@@ -10,13 +10,15 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
-// NavLink represents a link in the navigation menu.
+// Navigation link
+//
 type NavLink struct {
 	Text string `toml:"text"`
 	URL  string `toml:"url"`
 }
 
-// Config holds all site generation and server settings.
+// Configuration
+//
 type Config struct {
 	Title          string `toml:"title"`
 	Description    string `toml:"description"`
@@ -57,7 +59,8 @@ type Config struct {
 	Fortunes string   `toml:"fortunes"`
 }
 
-// New returns a configuration with sensible defaults.
+// Initialisation
+//
 func New() *Config {
 	return &Config{
 		Title:          "portsMaster",
@@ -72,7 +75,8 @@ func New() *Config {
 	}
 }
 
-// LoadFile parses a TOML configuration file.
+// File loading
+//
 func (c *Config) LoadFile(path string) error {
 	if path == "" {
 		return nil
@@ -87,7 +91,8 @@ func (c *Config) LoadFile(path string) error {
 	return toml.Unmarshal(data, c)
 }
 
-// ParseFlags updates configuration from command-line flags.
+// Flag parsing
+//
 func (c *Config) ParseFlags(args []string) (string, error) {
 	fs := flag.NewFlagSet("portsMaster", flag.ContinueOnError)
 
@@ -149,12 +154,14 @@ func (c *Config) ParseFlags(args []string) (string, error) {
 	return configPath, nil
 }
 
-// IsRemote checks if a path is a remote URL.
+// Remote check
+//
 func IsRemote(path string) bool {
 	return len(path) > 4 && (path[:4] == "http" || path[:4] == "ftp:")
 }
 
-// Finalize resolves paths and sets derived values.
+// Finalisation
+//
 func (c *Config) Finalize() {
 	if c.BaseURL == "/" {
 		c.BaseURL = ""
@@ -185,7 +192,8 @@ func (c *Config) Finalize() {
 	c.AssetsDir = expand(c.AssetsDir)
 }
 
-// AssetURL returns a path relative to the site root for the given asset.
+// Asset URL
+//
 func (c *Config) AssetURL(path string) string {
 	if IsRemote(path) || (len(path) > 0 && path[0] == '/') {
 		return path

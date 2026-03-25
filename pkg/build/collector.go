@@ -2,29 +2,40 @@ package build
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
+	"portsMaster/pkg/cache"
 	"portsMaster/pkg/config"
 	"portsMaster/pkg/model"
 	"portsMaster/pkg/registry"
 	"portsMaster/pkg/source"
 )
 
-// Collector gathers data from various sources to build the site database.
+// Data collector
+//
 type Collector struct {
-	cfg     *config.Config
-	reg     *registry.Registry
-	scanner model.Scanner
+	cfg      *config.Config
+	reg      *registry.Registry
+	scanner  model.Scanner
+	manifest *cache.Manifest
 }
 
-// NewCollector creates a new data collector.
-func NewCollector(cfg *config.Config, reg *registry.Registry, scanner model.Scanner) *Collector {
-	return &Collector{cfg: cfg, reg: reg, scanner: scanner}
+// Initialisation
+//
+func NewCollector(cfg *config.Config, reg *registry.Registry, scanner model.Scanner, manifest *cache.Manifest) *Collector {
+	return &Collector{cfg: cfg, reg: reg, scanner: scanner, manifest: manifest}
 }
 
-// Stream scans the ports and streams results through channels.
+// Data streaming
+//
 func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, metaChan chan<- *model.Database) error {
 	defer close(portChan)
 	defer close(metaChan)
@@ -40,10 +51,14 @@ func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, met
 		GeneratedAt: time.Now(),
 	}
 
+	// Package scanning
+	//
 	if c.reg.PkgsRoot() != "" {
 		source.ScanPackages(c.reg, ports)
 	}
 
+	// CI status loading
+	//
 	ciData := make(map[string]*model.CIInfo)
 	ciPath := c.cfg.CIStatus
 	if ciPath == "" {
@@ -56,6 +71,8 @@ func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, met
 		}
 	}
 
+	// Git data loading
+	//
 	if gp, err := source.NewGitProvider(c.reg.PortsRoot()); err == nil {
 		history, recent, stats, _ := gp.GetRepositoryDataCached(ports, c.cfg.CacheDir)
 		db.RecentCommits = recent
@@ -69,16 +86,27 @@ func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, met
 		}
 	}
 
+	// Parallel log processing
+	//
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, 32)
 	for _, p := range ports {
 		if ci, ok := ciData[p.Category+"/"+p.Name]; ok {
 			p.CI = ci
-			// Prefix BuildLog with LogsPath if set.
-			// We check if BuildLog is already a remote URL or absolute path.
-			logsRoot := c.cfg.Metadata.LogsPath
-			if logsRoot != "" && p.CI.BuildLog != "" && !config.IsRemote(p.CI.BuildLog) && !strings.HasPrefix(p.CI.BuildLog, "/") {
-				p.CI.BuildLog = strings.TrimRight(logsRoot, "/") + "/" + p.CI.BuildLog
-			}
+			wg.Add(1)
+			go func(port *model.Port) {
+				defer wg.Done()
+				sem <- struct{}{}
+				defer func() { <-sem }()
+				c.processLog(port)
+			}(p)
 		}
+	}
+	wg.Wait()
+
+	// Port streaming
+	//
+	for _, p := range ports {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -90,7 +118,71 @@ func (c *Collector) Stream(ctx context.Context, portChan chan<- *model.Port, met
 	return nil
 }
 
-// PrepareSiteData processes the database into a format suitable for view rendering.
+// Log processing
+//
+func (c *Collector) processLog(p *model.Port) {
+	if p.CI == nil || p.CI.BuildLog == "" {
+		return
+	}
+
+	// remote path detection
+	//
+	logsRoot := c.cfg.Metadata.LogsPath
+	if logsRoot != "" && !config.IsRemote(p.CI.BuildLog) && !strings.HasPrefix(p.CI.BuildLog, "/") {
+		p.CI.BuildLog = strings.TrimRight(logsRoot, "/") + "/" + p.CI.BuildLog
+	}
+
+	logName := "ci_log.txt"
+	cachePath := filepath.Join(c.cfg.CacheDir, "logs", p.Category, p.Name, logName)
+	cacheKey := fmt.Sprintf("log:%s:%d", p.Category+"/"+p.Name, p.CI.BuildStarted)
+
+	var logContent []byte
+	// Cache invalidation based on build timestamp
+	//
+	if !c.manifest.HasChanged(cacheKey, cacheKey) {
+		logContent, _ = os.ReadFile(cachePath)
+		if len(logContent) > 0 {
+			c.manifest.MarkUsed(cacheKey)
+		}
+	}
+
+	// fetch remote logs
+	//
+	if len(logContent) == 0 && config.IsRemote(p.CI.BuildLog) {
+		resp, err := http.Get(p.CI.BuildLog)
+		if err == nil && resp.StatusCode == http.StatusOK {
+			logContent, _ = io.ReadAll(resp.Body)
+			resp.Body.Close()
+
+			// skip HTML error pages
+			//
+			trimmed := strings.TrimSpace(string(logContent))
+			if strings.HasPrefix(strings.ToLower(trimmed), "<!doctype") || strings.HasPrefix(strings.ToLower(trimmed), "<html") {
+				logContent = nil
+			} else {
+				os.MkdirAll(filepath.Dir(cachePath), 0755)
+				os.WriteFile(cachePath, logContent, 0644)
+				c.manifest.Update(cacheKey, cacheKey)
+			}
+		}
+	} else if len(logContent) == 0 {
+		// local file reading
+		//
+		logContent, _ = os.ReadFile(p.CI.BuildLog)
+	}
+
+	// data embedding
+	//
+	if len(logContent) > 0 {
+		if p.FileContents == nil {
+			p.FileContents = make(map[string]string)
+		}
+		p.FileContents[logName] = string(logContent)
+	}
+}
+
+// Site data preparation
+//
 func (c *Collector) PrepareSiteData(db *model.Database) *model.SiteData {
 	data := &model.SiteData{
 		Categories:       db.Categories,
@@ -140,7 +232,8 @@ func (c *Collector) PrepareSiteData(db *model.Database) *model.SiteData {
 			}
 		}
 
-		// A port is considered "new" if its oldest commit is within the last 30 days
+		// new port detection
+		//
 		if len(p.Commits) > 0 {
 			oldest := p.Commits[len(p.Commits)-1].Date
 			if oldest.After(monthAgo) {
@@ -180,6 +273,8 @@ func (c *Collector) PrepareSiteData(db *model.Database) *model.SiteData {
 	return data
 }
 
+// Size statistics
+//
 func (c *Collector) finalizeSizeStats(data *model.SiteData) {
 	for _, p := range data.Ports {
 		if p.CI != nil && p.CI.Size > 0 {
@@ -194,6 +289,8 @@ func (c *Collector) finalizeSizeStats(data *model.SiteData) {
 	}
 }
 
+// Contributor statistics
+//
 func (c *Collector) finalizeContributorStats(data *model.SiteData) {
 	for _, v := range data.ContributorStats {
 		data.AllAuthors = append(data.AllAuthors, v.Name)
@@ -206,6 +303,8 @@ func (c *Collector) finalizeContributorStats(data *model.SiteData) {
 	})
 }
 
+// Recipe statistics
+//
 func (c *Collector) finalizeRecipeStats(data *model.SiteData) {
 	data.TopRecipes = make([]*model.Port, len(data.Ports))
 	copy(data.TopRecipes, data.Ports)
@@ -226,6 +325,8 @@ func (c *Collector) finalizeRecipeStats(data *model.SiteData) {
 	}
 }
 
+// Activity statistics
+//
 func (c *Collector) finalizeActivityStats(data *model.SiteData, activity, updates, builds map[string]int) {
 	data.MaxDailyCommits = 1
 	start := time.Now().AddDate(0, 0, -60)

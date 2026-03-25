@@ -98,6 +98,22 @@ templ PortDetail(data *model.SiteData, p *model.Port, cfg *config.Config, curren
 						</tbody>
 					</table>
 				}
+
+				// Files
+				//
+				if len(p.Files) > 0 {
+					<div class="section-header mt-30">Files</div>
+					<ul class="dep-list">
+						for _, f := range p.Files {
+							if f != "ci_log.txt" {
+								<li class="dep-item">
+									@FileIcon(f)
+									<a href={ templ.SafeURL(Href(currentPath, fmt.Sprintf("/ports/%s/%s/viewer_%s.html", p.Category, p.Name, f))) } target="_blank">{ f }</a>
+								</li>
+							}
+						}
+					</ul>
+				}
 			</div>
 
 			<div class="ci-section">
@@ -116,7 +132,8 @@ templ PortDetail(data *model.SiteData, p *model.Port, cfg *config.Config, curren
 										<strong class="status-orange">{ strings.ToUpper(p.CI.Status) }</strong>
 								}
 								if p.CI.BuildLog != "" {
-									<a href={ templ.SafeURL(p.CI.BuildLog) } class="ml-10 text-tiny" target="_blank">[LOG]</a>
+									{{ logName := "ci_log.txt" }}
+									<a href={ templ.SafeURL(Href(currentPath, fmt.Sprintf("/ports/%s/%s/viewer_%s.html", p.Category, p.Name, logName))) } class="ml-10 text-tiny" target="_blank">[LOG]</a>
 								}
 							</div>
 						</div>

@@ -1,0 +1,118 @@
+package views
+
+import (
+	"path/filepath"
+	"strings"
+)
+
+// URL parsing
+//
+func Href(current, target string) templ.SafeURL {
+	if strings.HasPrefix(target, "http") || strings.HasPrefix(target, "//") {
+		return templ.SafeURL(target)
+	}
+
+	if !strings.HasPrefix(target, "/") {
+		return templ.SafeURL(target)
+	}
+
+	parts := strings.SplitN(target, "?", 2)
+	path := strings.TrimPrefix(parts[0], "/")
+	query := ""
+	if len(parts) > 1 {
+		query = "?" + parts[1]
+	}
+
+	baseDir := filepath.Dir(current)
+	if baseDir == "." {
+		baseDir = ""
+	}
+
+	rel, err := filepath.Rel(baseDir, path)
+	if err != nil {
+		return templ.SafeURL("/" + path + query)
+	}
+
+	rel = filepath.ToSlash(rel)
+	return templ.SafeURL(rel + query)
+}
+
+// Icon selection
+//
+func FileIconName(filename string) string {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp":
+		return "picture"
+	case ".py":
+		return "python"
+	case ".js":
+		return "js"
+	case ".html":
+		return "html"
+	case ".css":
+		return "css"
+	case ".json":
+		return "json"
+	case ".md":
+		return "markdown"
+	case ".lua":
+		return "lua"
+	case ".php":
+		return "php"
+	case ".rb":
+		return "ruby"
+	case ".hs":
+		return "haskell"
+	case ".swift":
+		return "swift"
+	case ".java":
+		return "java"
+	case ".kt":
+		return "kotlin"
+	case ".tex":
+		return "latex"
+	case ".diff":
+		return "diff"
+	case ".cpp", ".cc", ".cxx":
+		return "cpp"
+	case ".cs":
+		return "cs"
+	case ".pl":
+		return "perl"
+	default:
+		return ""
+	}
+}
+
+// File icons
+//
+templ FileIcon(filename string) {
+	if name := FileIconName(filename); name != "" {
+		<span class="picon mr-5">{ name }</span>
+	} else if ext := strings.ToLower(filepath.Ext(filename)); ext == "" {
+		if filename == "info" || filename == "deps" {
+			<span class="picon mr-5">file</span>
+		} else {
+			<span class="picon mr-5">file</span>
+		}
+	} else if e := strings.TrimPrefix(ext, "."); len(e) > 0 {
+		<s class="picon-compose mr-5"><span class="picon-parent">file</span><span class="picon-child">{ string(e[0]) }if len(e) > 1 {
+	{ string(e[1]) }
+}</span></s>
+	} else {
+		<span class="picon mr-5">file</span>
+	}
+}
+
+// Image check
+//
+func IsImage(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp":
+		return true
+	default:
+		return false
+	}
+}

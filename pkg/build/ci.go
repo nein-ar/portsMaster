@@ -8,6 +8,8 @@ import (
 	"portsMaster/pkg/model"
 )
 
+// CI data generation
+//
 func (e *Engine) GenerateCIData(ports []*model.Port) error {
 	ciData := make(map[string]*model.CIInfo)
 

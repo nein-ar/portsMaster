@@ -8,14 +8,16 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// HashString returns the BLAKE3 hash of a string.
+// String hashing
+//
 func HashString(s string) string {
 	h := blake3.New(32, nil)
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// HashFile returns the BLAKE3 hash of a file's content.
+// File hashing
+//
 func HashFile(path string) (string, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -30,14 +32,16 @@ func HashFile(path string) (string, error) {
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
-// HashBytes returns the BLAKE3 hash of a byte slice.
+// Byte hashing
+//
 func HashBytes(b []byte) string {
 	h := blake3.New(32, nil)
 	h.Write(b)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// Hasher helps accumulate hashes for complex objects.
+// Hash accumulator
+//
 type Hasher struct {
 	h *blake3.Hasher
 }

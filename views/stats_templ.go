@@ -814,7 +814,7 @@ func Stats(data *model.SiteData, cfg *config.Config, currentPath string) templ.C
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</p></div></div><script>\n\t\t\t// In addition to app.js, we can trigger it here if needed, \n\t\t\t// but app.js on DOMContentLoaded should handle it.\n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</p></div></div><script>\n\t\t\t// app.js handles dynamic elements\n\t\t\t//\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let portsData = [];
     const baseUrl = document.body.dataset.baseUrl || '';
 
-    // Load ports data
+    // Data loading
+    //
     fetch(baseUrl + '/ports.json')
         .then(r => r.json())
         .then(data => {
             portsData = data || [];
-            // Check for query in URL
+            
+            // automatic search from URL
+            //
             const urlParams = new URLSearchParams(window.location.search);
             const q = urlParams.get('query') || urlParams.get('q');
             if (q) {
@@ -35,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     searchForm.addEventListener('submit', (e) => {
         e.preventDefault();
         performSearch(queryInput.value);
-        // Update URL
         const url = new URL(window.location);
         url.searchParams.set('q', queryInput.value);
         window.history.pushState({}, '', url);
@@ -63,7 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
             filtered = portsData.filter(p => evaluateQuery(p, rawQuery));
         }
 
-        // Global category filter from dropdown
+        // dropdown filter application
+        //
         if (filterCategory.value) {
             filtered = filtered.filter(p => p.c === filterCategory.value);
         }
@@ -72,13 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
         displayResults(filtered, query, Math.round(endTime - startTime));
     }
 
+    // Query evaluation
+    //
     function evaluateQuery(p, query) {
-        // Support logical OR (||)
+        // support logical OR
+        //
         const orGroups = query.split(/\|\||\s+OR\s+/i);
         return orGroups.some(group => {
             const trimmedGroup = group.trim();
             if (!trimmedGroup) return false;
-            // Support logical AND (&&) within groups
+            // support logical AND
+            //
             const tokens = trimmedGroup.split(/&&|\s+AND\s+/i);
             return tokens.every(token => matchToken(p, token.trim()));
         });
@@ -120,7 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
             match = p.dt > limit;
         }
         else {
-            // Standard search across multiple fields
+            // multicore field check
+            //
             let fieldsMatch = false;
             if (searchName.checked && p.n.toLowerCase().includes(text)) fieldsMatch = true;
             if (searchDesc.checked && p.d.toLowerCase().includes(text)) fieldsMatch = true;
@@ -132,6 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return invert ? !match : match;
     }
 
+    // Result display
+    //
     function displayResults(results, query, time) {
         resultsDiv.classList.remove('display-none');
         resultsDiv.classList.add('display-block');
@@ -174,6 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Match highlighting
+    //
     function highlightMatch(text, query) {
         if (!query || query.includes(':') || query === '*') return text;
         const words = query.split(/\s+/).filter(w => w.length > 2 && !['and', 'or', 'not'].includes(w.toLowerCase()));

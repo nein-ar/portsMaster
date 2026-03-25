@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allCommits = [];
 
+    // Commits rendering
+    //
     function render(filtered) {
         if (!filtered || filtered.length === 0) {
             container.innerHTML = '<p class="p-20 text-center">No matching commits found.</p>';
@@ -50,6 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
+    // Filter application
+    //
     function applyFilters() {
         const author = authorFilter?.value;
         const timeframe = timeframeFilter?.value;
@@ -77,13 +81,18 @@ document.addEventListener('DOMContentLoaded', () => {
         render(filtered);
     }
 
+    // Data fetching
+    //
     fetch(url)
         .then(r => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            if (!r.ok) throw new Error(`HTTP ${res.status}`);
             return r.json();
         })
         .then(data => {
             allCommits = (data || []).filter(c => c && c.hash);
+            
+            // authors filter initialisation
+            //
             if (authorFilter) {
                 const authors = [...new Set(allCommits.map(c => c.author))].filter(Boolean).sort();
                 authorFilter.innerHTML = '<option value="">all authors</option>' + 

@@ -1,0 +1,57 @@
+package views
+
+import (
+	"portsMaster/pkg/config"
+	"portsMaster/pkg/model"
+	"context"
+	"io"
+)
+
+// Embedded script
+//
+func EmbeddedScript(jsonData string) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+		_, err := io.WriteString(w, `<script id="embedded-content" type="application/json">`)
+		if err != nil { return err }
+		_, err = io.WriteString(w, jsonData)
+		if err != nil { return err }
+		_, err = io.WriteString(w, `</script>`)
+		return err
+	})
+}
+
+// Viewer
+//
+templ Viewer(data *model.SiteData, p *model.Port, filename, content string, isImg bool, jsonData string, cfg *config.Config, currentPath string) {
+	@Layout("File Viewer: "+filename, data, cfg, currentPath) {
+		<div id="viewer-shell">
+			<div id="viewer-header">
+				<span>{ p.Category }/{ p.Name }/{ filename }</span>
+			</div>
+			<div id="viewer-viewport">
+				if filename == "ci_log.txt" {
+					// Log rendering
+					//
+					<div id="viewer-term" tabindex="0"></div>
+					@EmbeddedScript(jsonData)
+					<script src={ Href(currentPath, cfg.AssetURL("microvt.js")) }></script>
+					<script src={ Href(currentPath, cfg.AssetURL("viewer.js")) }></script>
+				} else if isImg {
+					// Image rendering
+					//
+					<div class="static-viewer">
+						<pre class="terminal-cmd">$ eimg --input ./{ filename }</pre>
+						<img src={ templ.SafeURL(content) } alt={ filename } class="embedded-img" />
+					</div>
+				} else {
+					// Text rendering
+					//
+					<div class="static-viewer">
+						<pre class="terminal-cmd">$ cat { filename }</pre>
+						<pre class="terminal-content">{ content }</pre>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}

@@ -8,7 +8,8 @@ import (
 	"portsMaster/pkg/registry"
 )
 
-// NewScanner returns a scanner implementation based on the configuration.
+// Scanner factory
+//
 func NewScanner(cfg *config.Config, reg *registry.Registry) (model.Scanner, error) {
 	switch cfg.PackageManager {
 	case "spc":
@@ -19,7 +20,8 @@ func NewScanner(cfg *config.Config, reg *registry.Registry) (model.Scanner, erro
 	}
 }
 
-// NewParser returns a parser implementation based on the configuration.
+// Parser factory
+//
 func NewParser(cfg *config.Config, reg *registry.Registry) (model.Parser, error) {
 	switch cfg.PackageManager {
 	case "spc":

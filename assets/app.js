@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Handle dynamic dimensions without inline style="" attribute in HTML source
+    // avoid inline style attributes in HTML source
+    //
     document.querySelectorAll('.js-width-bar').forEach(bar => {
         const width = bar.dataset.width;
         if (width) {

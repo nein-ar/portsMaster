@@ -2,6 +2,7 @@ package spc
 
 import (
 	"bufio"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"os"
@@ -14,6 +15,8 @@ import (
 	"lukechampine.com/blake3"
 )
 
+// Parser
+//
 type Parser struct {
 	reg *registry.Registry
 }
@@ -22,22 +25,32 @@ func NewParser(reg *registry.Registry) *Parser {
 	return &Parser{reg: reg}
 }
 
+// Port directory
+//
 func (pr *Parser) PortDir(category, name string) string {
 	return filepath.Join(pr.reg.PortsRoot(), category, name)
 }
 
+// Port info file
+//
 func (pr *Parser) PortInfoFile(category, name string) string {
 	return filepath.Join(pr.PortDir(category, name), "info")
 }
 
+// Port deps file
+//
 func (pr *Parser) PortDepsFile(category, name string) string {
 	return filepath.Join(pr.PortDir(category, name), "deps")
 }
 
+// Port type
+//
 func (pr *Parser) Type() string {
 	return "spc"
 }
 
+// Port parsing
+//
 func (pr *Parser) Parse(category, name string) (*model.Port, error) {
 	path := pr.PortDir(category, name)
 
@@ -66,7 +79,7 @@ func (pr *Parser) Parse(category, name string) (*model.Port, error) {
 	p.Upstream = ExpandVariables(p.Upstream, map[string]string{
 		"VERSION":     p.Version,
 		"NAME":        p.Name,
-		"COMMIT":      p.Version, // Often commit is the version
+		"COMMIT":      p.Version, 
 		"RELEASE":     p.Release,
 		"RELEASE_TAG": p.Release,
 	})
@@ -76,9 +89,49 @@ func (pr *Parser) Parse(category, name string) (*model.Port, error) {
 		p.RecipeLines = lines
 	}
 
+	files, _ := filepath.Glob(filepath.Join(path, "*"))
+	p.FileContents = make(map[string]string)
+	for _, f := range files {
+		info, err := os.Stat(f)
+		if err == nil && !info.IsDir() {
+			name := filepath.Base(f)
+			p.Files = append(p.Files, name)
+
+			// File embedding
+			//
+			if info.Size() < 5*1024*1024 {
+				content, err := os.ReadFile(f)
+				if err == nil {
+					if IsImage(name) {
+						ext := strings.TrimPrefix(filepath.Ext(name), ".")
+						if ext == "jpg" { ext = "jpeg" }
+						encoded := base64.StdEncoding.EncodeToString(content)
+						p.FileContents[name] = fmt.Sprintf("data:image/%s;base64,%s", ext, encoded)
+					} else {
+						p.FileContents[name] = string(content)
+					}
+				}
+			}
+		}
+	}
+
 	return p, nil
 }
 
+// Image check
+//
+func IsImage(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp":
+		return true
+	default:
+		return false
+	}
+}
+
+// Line count
+//
 func countLines(path string) (int, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -94,7 +147,8 @@ func countLines(path string) (int, error) {
 	return count, scanner.Err()
 }
 
-// ExpandVariables replaces ${VAR} in text with values from vars.
+// Variable expansion
+//
 func ExpandVariables(text string, vars map[string]string) string {
 	for k, v := range vars {
 		text = strings.ReplaceAll(text, "${"+k+"}", v)
@@ -102,6 +156,8 @@ func ExpandVariables(text string, vars map[string]string) string {
 	return text
 }
 
+// Info file parsing
+//
 func parseInfoFile(p *model.Port, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -152,6 +208,8 @@ func parseInfoFile(p *model.Port, path string) error {
 	return scanner.Err()
 }
 
+// Deps file parsing
+//
 func parseDepsFile(p *model.Port, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -189,6 +247,8 @@ func parseDepsFile(p *model.Port, path string) error {
 	return scanner.Err()
 }
 
+// Directory hash calculation
+//
 func calculateDirHash(dir string) (string, error) {
 	h := blake3.New(32, nil)
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {

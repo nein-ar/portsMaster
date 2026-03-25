@@ -11,23 +11,27 @@ import (
 	"portsMaster/pkg/registry"
 )
 
-// Scanner implements model.Scanner for the SPC format.
+// Scanner
+//
 type Scanner struct {
 	reg    *registry.Registry
 	parser model.Parser
 }
 
-// NewScanner creates a new SPC scanner.
+// Initialisation
+//
 func NewScanner(reg *registry.Registry, parser model.Parser) *Scanner {
 	return &Scanner{reg: reg, parser: parser}
 }
 
-// Type returns the scanner format type.
+// Scanner type
+//
 func (s *Scanner) Type() string {
 	return "spc"
 }
 
-// Scan traverses the ports directory to discover categories and ports.
+// Directory scanning
+//
 func (s *Scanner) Scan(ctx context.Context) ([]*model.Category, []*model.Port, error) {
 	entries, err := os.ReadDir(s.reg.PortsRoot())
 	if err != nil {
@@ -75,7 +79,8 @@ func (s *Scanner) Scan(ctx context.Context) ([]*model.Category, []*model.Port, e
 					return
 				}
 
-				// Check for BROKEN file override
+				// check for manual BROKEN override
+				//
 				if _, err := os.Stat(filepath.Join(p.FilePath, "BROKEN")); err == nil {
 					p.IsBroken = true
 				}

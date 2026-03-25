@@ -9,15 +9,16 @@ import (
 	"portsMaster/pkg/registry"
 )
 
-// ScanPackages walks the Registry's package root and augments ports with binary package info.
-// Structure: category/package/package.spc.<fmt>
+// Package scanning
+//
 func ScanPackages(reg *registry.Registry, ports []*model.Port) error {
 	pkgsRoot := reg.PkgsRoot()
 	if pkgsRoot == "" {
 		return nil
 	}
 
-	// Check if PkgsRoot is remote (starts with http). If so, we can't scan it with os.ReadDir.
+	// remote paths cannot be scanned
+	//
 	if len(pkgsRoot) > 4 && (pkgsRoot[:4] == "http" || pkgsRoot[:4] == "ftp:") {
 		return nil
 	}
@@ -67,6 +68,9 @@ func ScanPackages(reg *registry.Registry, ports []*model.Port) error {
 					continue
 				}
 				name := f.Name()
+				
+				// spc package identification
+				//
 				if strings.Contains(name, ".spc.") {
 					info := model.PackageInfo{
 						Filename: name,

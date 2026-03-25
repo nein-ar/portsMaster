@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 )
 
-// Registry acts as the central source of truth for filesystem paths.
-// It decouples the core engine from specific directory layouts.
+// Registry
+//
 type Registry struct {
 	portsRoot  string
 	pkgsRoot   string
@@ -14,7 +14,8 @@ type Registry struct {
 	assetsRoot string
 }
 
-// New creates a new registry with the provided root paths.
+// Initialisation
+//
 func New(ports, pkgs, logs, output, assets string) *Registry {
 	clean := func(p string) string {
 		if len(p) > 4 && (p[:4] == "http" || p[:4] == "ftp:") {
@@ -37,17 +38,20 @@ func (r *Registry) LogsRoot() string   { return r.logsRoot }
 func (r *Registry) OutputRoot() string { return r.outputRoot }
 func (r *Registry) AssetsRoot() string { return r.assetsRoot }
 
-// PublicAsset returns the destination path for a public asset.
+// Public asset path
+//
 func (r *Registry) PublicAsset(filename string) string {
 	return filepath.Join(r.outputRoot, "assets", filename)
 }
 
-// PublicPage returns the destination path for a public HTML page.
+// Public page path
+//
 func (r *Registry) PublicPage(path string) string {
 	return filepath.Join(r.outputRoot, path)
 }
 
-// AssetSource returns the source path for an asset.
+// Asset source path
+//
 func (r *Registry) AssetSource(filename string) string {
 	return filepath.Join(r.assetsRoot, filename)
 }

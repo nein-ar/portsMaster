@@ -9,7 +9,8 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// HashFiles returns a combined BLAKE3 hash of the listed files' content.
+// File hashing
+//
 func HashFiles(paths ...string) string {
 	h := blake3.New(32, nil)
 	for _, p := range paths {
@@ -25,7 +26,8 @@ func HashFiles(paths ...string) string {
 
 var mdLinkRegex = regexp.MustCompile(`\[([^\]]*)\]\([^)]*\)`)
 
-// StripMarkdownLinks converts [Text](Url) to Text.
+// Markdown stripping
+//
 func StripMarkdownLinks(text string) string {
 	return mdLinkRegex.ReplaceAllString(text, "$1")
 }

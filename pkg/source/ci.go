@@ -9,7 +9,8 @@ import (
 	"portsMaster/pkg/model"
 )
 
-// LoadCIStatus reads a JSON file mapping "category/name" to CIInfo.
+// CI status loading
+//
 func LoadCIStatus(path string) (map[string]*model.CIInfo, error) {
 	var rc io.ReadCloser
 	if len(path) > 4 && path[:4] == "http" {

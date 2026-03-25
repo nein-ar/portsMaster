@@ -4,7 +4,8 @@ import (
 	"portsMaster/pkg/model"
 )
 
-// SearchForm renders the search input, category select, and optionally license select.
+// Search form
+//
 templ SearchForm(data *model.SiteData, currentPath string, formID, inputID, selectID string, showAdvanced bool) {
 	<form class="search-box" action={ Href(currentPath, "/search/index.html") } method="GET" id={ formID }>
 		<input type="text" name="q" placeholder="search ports..." id={ inputID }/>

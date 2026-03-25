@@ -26,6 +26,8 @@ import (
 	minjson "github.com/tdewolff/minify/v2/json"
 )
 
+// Build engine
+//
 type Engine struct {
 	cfg      *config.Config
 	reg      *registry.Registry
@@ -36,6 +38,8 @@ type Engine struct {
 	Ready    chan struct{}
 }
 
+// Engine initialisation
+//
 func New(cfg *config.Config) (*Engine, error) {
 	reg := registry.New(cfg.PortsPath, cfg.Metadata.PkgsPath, cfg.Metadata.LogsPath, cfg.OutDir, cfg.AssetsDir)
 	scanner, err := port.NewScanner(cfg, reg)
@@ -53,8 +57,10 @@ func New(cfg *config.Config) (*Engine, error) {
 	}, nil
 }
 
+// Execution loop
+//
 func (e *Engine) Run(ctx context.Context) error {
-	col := NewCollector(e.cfg, e.reg, e.scanner)
+	col := NewCollector(e.cfg, e.reg, e.scanner, e.manifest)
 	portChan := make(chan *model.Port, 100)
 	metaChan := make(chan *model.Database, 1)
 	errChan := make(chan error, 1)
@@ -113,6 +119,8 @@ func (e *Engine) Run(ctx context.Context) error {
 	return e.manifest.Save(filepath.Join(e.cfg.CacheDir, "manifest.json"))
 }
 
+// Core page rendering
+//
 func (e *Engine) renderCorePages(data *model.SiteData, db *model.Database, globalHash, dataHash string) {
 	pages := []struct {
 		path string
@@ -130,6 +138,8 @@ func (e *Engine) renderCorePages(data *model.SiteData, db *model.Database, globa
 	}
 }
 
+// Category rendering
+//
 func (e *Engine) renderCategories(data *model.SiteData, db *model.Database, globalHash, dataHash string) {
 	for _, c := range db.Categories {
 		path := fmt.Sprintf("categories/%s/index.html", c.Name)
@@ -137,6 +147,8 @@ func (e *Engine) renderCategories(data *model.SiteData, db *model.Database, glob
 	}
 }
 
+// Port rendering
+//
 func (e *Engine) renderPorts(data *model.SiteData, db *model.Database, globalHash, dataHash string) {
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, 32)
@@ -153,6 +165,22 @@ func (e *Engine) renderPorts(data *model.SiteData, db *model.Database, globalHas
 			path := fmt.Sprintf("ports/%s/%s/index.html", p.Category, p.Name)
 			e.render(path, views.PortDetail(data, p, e.cfg, path), e.computePortHash(p, globalHash, dataHash, data.SimplePortMap))
 
+			// Port file viewers
+			//
+			for file, content := range p.FileContents {
+				vPath := fmt.Sprintf("ports/%s/%s/viewer_%s.html", p.Category, p.Name, file)
+				
+				isImg := views.IsImage(file)
+				vData := map[string]interface{}{
+					"filename": file,
+					"content":  content,
+					"isImg":    isImg,
+				}
+				jb, _ := json.Marshal(vData)
+
+				e.render(vPath, views.Viewer(data, p, file, content, isImg, string(jb), e.cfg, vPath), e.computePortHash(p, globalHash, dataHash, data.SimplePortMap))
+			}
+
 			if atomic.AddUint64(&processed, 1) == total/10 {
 				select {
 				case e.Ready <- struct{}{}:
@@ -164,12 +192,17 @@ func (e *Engine) renderPorts(data *model.SiteData, db *model.Database, globalHas
 	wg.Wait()
 }
 
+// HTML generator
+//
 func (e *Engine) render(path string, comp templ.Component, hash string) {
 	e.mu.Lock()
 	e.touched[path] = true
 	e.mu.Unlock()
 
+	// Cache check
+	//
 	if !e.manifest.HasChanged(path, hash) {
+		e.manifest.MarkUsed(path)
 		return
 	}
 
@@ -185,6 +218,8 @@ func (e *Engine) render(path string, comp templ.Component, hash string) {
 	e.manifest.Update(path, hash)
 }
 
+// JSON exporter
+//
 func (e *Engine) exportJSON(path string, data interface{}, global string) {
 	e.mu.Lock()
 	e.touched[path] = true
@@ -193,6 +228,7 @@ func (e *Engine) exportJSON(path string, data interface{}, global string) {
 	b, _ := json.Marshal(data)
 	h := cache.HashString(global + string(b))
 	if !e.manifest.HasChanged(path, h) {
+		e.manifest.MarkUsed(path)
 		return
 	}
 
@@ -212,6 +248,8 @@ func (e *Engine) exportJSON(path string, data interface{}, global string) {
 	e.manifest.Update(path, h)
 }
 
+// Asset sync
+//
 func (e *Engine) syncAssets(global string) {
 	if config.IsRemote(e.cfg.AssetsDir) {
 		return
@@ -234,9 +272,13 @@ func (e *Engine) syncAssets(global string) {
 		if e.manifest.HasChanged(path, h) {
 			copyFile(src, e.reg.PublicAsset(entry.Name()))
 			e.manifest.Update(path, h)
+		} else {
+			e.manifest.MarkUsed(path)
 		}
 	}
 
+	// Stale asset cleanup
+	//
 	publicAssetsDir := filepath.Join(e.cfg.OutDir, "assets")
 	pEntries, _ := os.ReadDir(publicAssetsDir)
 	for _, entry := range pEntries {
@@ -251,13 +293,12 @@ func (e *Engine) syncAssets(global string) {
 
 		if !isTouched {
 			os.Remove(filepath.Join(publicAssetsDir, entry.Name()))
-			e.mu.Lock()
-			delete(e.manifest.Hashes, path)
-			e.mu.Unlock()
 		}
 	}
 }
 
+// Fortunes generation
+//
 func (e *Engine) renderFortunes(global string) {
 	if e.cfg.Fortunes == "" {
 		return
@@ -306,15 +347,36 @@ func (e *Engine) renderFortunes(global string) {
 	e.render("assets/fortunes.js", views.FortunesScript(fortunes), h)
 }
 
+// Cleanup and trimming
+//
 func (e *Engine) cleanup() {
+	// Trim manifest and remove stale files
+	//
 	for path := range e.manifest.Hashes {
-		if !e.touched[path] {
-			os.Remove(e.reg.PublicPage(path))
+		if !e.manifest.IsUsed(path) {
+			if strings.HasPrefix(path, "log:") {
+				// Trim stale CI logs from cache
+				//
+				parts := strings.Split(path, ":")
+				if len(parts) >= 2 {
+					portParts := strings.Split(parts[1], "/")
+					if len(portParts) == 2 {
+						logFile := filepath.Join(e.cfg.CacheDir, "logs", portParts[0], portParts[1], "ci_log.txt")
+						os.Remove(logFile)
+					}
+				}
+			} else {
+				// Remove stale public pages
+				//
+				os.Remove(e.reg.PublicPage(path))
+			}
 			delete(e.manifest.Hashes, path)
 		}
 	}
 }
 
+// Global hash calculation
+//
 func (e *Engine) computeGlobalHash() string {
 	h := cache.NewHasher()
 	h.Add(cache.ManifestVersion)
@@ -331,12 +393,16 @@ func (e *Engine) computeGlobalHash() string {
 	return h.Sum()
 }
 
+// Data hash calculation
+//
 func (e *Engine) computeDataHash(d *model.SiteData) string {
 	return cache.HashString(fmt.Sprintf("%d-%d-%d-%d-%d-%d", 
 		d.TotalPorts, d.BrokenCount, d.TotalCommits, 
 		d.BuildStats.Success, d.BuildStats.Failed, d.BuildStats.Total))
 }
 
+// Port hash calculation
+//
 func (e *Engine) computePortHash(p *model.Port, global, data string, pm map[string]*model.Port) string {
 	h := cache.NewHasher()
 	h.Add(global + data + p.Hash)
@@ -354,6 +420,8 @@ func (e *Engine) computePortHash(p *model.Port, global, data string, pm map[stri
 	return h.Sum()
 }
 
+// Category hash calculation
+//
 func (e *Engine) computeCategoryHash(c *model.Category, global, data string) string {
 	h := cache.NewHasher()
 	h.Add(global + data + c.Name)
@@ -363,6 +431,8 @@ func (e *Engine) computeCategoryHash(c *model.Category, global, data string) str
 	return h.Sum()
 }
 
+// Recent updates lookup
+//
 func (e *Engine) getRecentUpdates(ports []*model.Port) []*model.Port {
 	r := make([]*model.Port, len(ports))
 	copy(r, ports)
@@ -382,44 +452,48 @@ func (e *Engine) getRecentUpdates(ports []*model.Port) []*model.Port {
 	return r
 }
 
+// Search index builder
+//
 func (e *Engine) buildSearchIndex(ports []*model.Port) interface{} {
-	        type Entry struct {
-	                N  string   `json:"n"`
-	                C  string   `json:"c"`
-	                D  string   `json:"d"`
-	                V  string   `json:"v"`
-	                L  string   `json:"l,omitempty"`
-	                Ps []string `json:"pds,omitempty"`
-	                Ds []string `json:"dps,omitempty"`
-	                Br bool     `json:"br,omitempty"`
-	                Un bool     `json:"un,omitempty"`
-	                Dt int64    `json:"dt,omitempty"`
-	                A  string   `json:"a,omitempty"`
-	                St string   `json:"st,omitempty"`
-	        }
-	        out := make([]Entry, 0, len(ports))
-	        for _, p := range ports {
-	                ds := make([]string, len(p.Deps))
-	                for i, d := range p.Deps {
-	                        ds[i] = d.Name
-	                }
-	                dt := int64(0)
-	                if p.LastCommit != nil {
-	                        dt = p.LastCommit.Date.Unix()
-	                }
-	                st := ""
-	                if p.CI != nil {
-	                        st = p.CI.Status
-	                }
-	                                        out = append(out, Entry{
-	                                                N: p.Name, C: p.Category, D: p.Description, V: p.Version,
-	                                                L: p.License, Ps: p.Provides, Ds: ds, Br: p.IsBroken,
-	                                                Un: p.IsUnmaintained, Dt: dt, A: p.Maintainer, St: st,
-	                                        })
-	                                }
-	                        return out
-	                }
+	type Entry struct {
+		N  string   `json:"n"`
+		C  string   `json:"c"`
+		D  string   `json:"d"`
+		V  string   `json:"v"`
+		L  string   `json:"l,omitempty"`
+		Ps []string `json:"pds,omitempty"`
+		Ds []string `json:"dps,omitempty"`
+		Br bool     `json:"br,omitempty"`
+		Un bool     `json:"un,omitempty"`
+		Dt int64    `json:"dt,omitempty"`
+		A  string   `json:"a,omitempty"`
+		St string   `json:"st,omitempty"`
+	}
+	out := make([]Entry, 0, len(ports))
+	for _, p := range ports {
+		ds := make([]string, len(p.Deps))
+		for i, d := range p.Deps {
+			ds[i] = d.Name
+		}
+		dt := int64(0)
+		if p.LastCommit != nil {
+			dt = p.LastCommit.Date.Unix()
+		}
+		st := ""
+		if p.CI != nil {
+			st = p.CI.Status
+		}
+		out = append(out, Entry{
+			N: p.Name, C: p.Category, D: p.Description, V: p.Version,
+			L: p.License, Ps: p.Provides, Ds: ds, Br: p.IsBroken,
+			Un: p.IsUnmaintained, Dt: dt, A: p.Maintainer, St: st,
+		})
+	}
+	return out
+}
 
+// File copying
+//
 func copyFile(src, dst string) {
 	in, _ := os.Open(src)
 	defer in.Close()

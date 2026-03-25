@@ -1,9 +1,11 @@
+/* --- reset --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* --- base --- */
 body {
   font-family: monospace;
   font-size: 0.875rem;
@@ -28,17 +30,20 @@ a:hover {
   text-decoration: underline;
 }
 
+/* --- header --- */
 header {
   background: var(--header-bg);
   border-bottom: 0.125rem solid var(--header-border);
   padding: 0.625rem 0.9375rem;
 }
 
+/* terminal prompt aesthetic */
 header h1::before {
   content: '$ ';
   color: var(--text-muted);
 }
 
+/* root user aesthetic */
 header p::before {
   content: '# ';
   color: var(--text-dim);
@@ -55,6 +60,7 @@ header p {
   color: var(--text-dark);
 }
 
+/* --- utilities --- */
 .flex-between-baseline {
   display: flex;
   justify-content: space-between;
@@ -69,6 +75,7 @@ header p {
 
 .text-meta { color: var(--text-muted); font-size: 12px; }
 
+/* --- navigation --- */
 nav {
   background: var(--nav-bg);
   border-bottom: 0.0625rem solid var(--nav-border);
@@ -80,6 +87,7 @@ nav a {
   font-size: 0.8125rem;
 }
 
+/* --- search --- */
 .search-section {
   padding: 0.9375rem;
   background: var(--search-bg);
@@ -125,6 +133,7 @@ nav a {
   background: var(--btn-hover-bg);
 }
 
+/* --- global statistics --- */
 .stats {
   padding: 0.5rem 0.9375rem;
   background: var(--stats-bg);
@@ -133,6 +142,7 @@ nav a {
   color: var(--text-muted);
 }
 
+/* logging style prefix */
 .stats::before {
   content: '[INFO] ';
   color: var(--text-dim);
@@ -147,6 +157,7 @@ nav a {
   color: var(--text);
 }
 
+/* --- main layout --- */
 .main-content {
   padding: 1.25rem;
 }
@@ -161,11 +172,13 @@ nav a {
   letter-spacing: 0.03125rem;
 }
 
+/* prompt aesthetic */
 .section-header::before {
   content: '>> ';
   color: var(--text-dim);
 }
 
+/* --- tables --- */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -227,6 +240,7 @@ table tr:hover {
   border-bottom: 0.0625rem solid var(--commit-border);
 }
 
+/* list item aesthetic */
 .commit-entry::before {
   content: '* ';
   color: var(--text-dim);
@@ -243,6 +257,7 @@ table tr:hover {
   font-size: 0.75rem;
 }
 
+/* --- sidebar / quick links --- */
 .quick-links {
   background: var(--nav-bg);
   padding: 0.75rem 0.9375rem;
@@ -261,6 +276,7 @@ table tr:hover {
   font-size: 0.8125rem;
 }
 
+/* --- footer --- */
 footer {
   margin-top: 1.875rem;
   padding: 0.9375rem;
@@ -270,6 +286,7 @@ footer {
   color: var(--text-dark);
 }
 
+/* separator aesthetic */
 footer::before {
   content: '---\n';
   display: block;
@@ -277,6 +294,7 @@ footer::before {
   margin-bottom: 0.3125rem;
 }
 
+/* --- category grid --- */
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
@@ -301,7 +319,7 @@ footer::before {
   font-size: 0.75rem;
 }
 
-/* Specific styles for different pages */
+/* --- breadcrumbs --- */
 .breadcrumb {
   padding: 0.625rem 0.9375rem;
   background: var(--search-bg);
@@ -309,6 +327,7 @@ footer::before {
   font-size: 0.75rem;
 }
 
+/* --- filtering --- */
 .filter-bar {
   background: var(--search-bg);
   border: 0.0625rem solid var(--search-border);
@@ -327,6 +346,7 @@ footer::before {
   margin-right: 0.625rem;
 }
 
+/* --- commits list --- */
 .commit-list {
   border: 0.0625rem solid var(--input-border);
   background: var(--table-bg);
@@ -343,6 +363,7 @@ footer::before {
   border-bottom: none;
 }
 
+/* list item aesthetic */
 .commit-entry::before {
   content: '*';
   position: absolute;
@@ -404,6 +425,7 @@ footer::before {
   gap: 0.5rem;
 }
 
+/* file list aesthetic */
 .commit-files::before {
   content: 'Files:';
   font-weight: bold;
@@ -415,6 +437,7 @@ footer::before {
 .file-modified { color: orange; }
 .file-deleted { color: var(--status-err); }
 
+/* --- pagination --- */
 .pagination {
   margin-top: 1.25rem;
   padding: 0.625rem;
@@ -439,6 +462,7 @@ footer::before {
   font-weight: bold;
 }
 
+/* --- search forms --- */
 .search-form {
   border: 0.0625rem solid var(--input-border);
   padding: 0.9375rem;
@@ -469,6 +493,7 @@ footer::before {
   font-size: 0.75rem;
 }
 
+/* example list aesthetic */
 .search-examples::before {
   content: 'Examples:';
   display: block;
@@ -489,8 +514,9 @@ footer::before {
   font-size: 0.8125rem;
 }
 
+/* tree aesthetic */
 .filter-group-header::before {
-  content: '└─ ';
+  content: '+- ';
   color: var(--text-dim);
 }
 
@@ -516,6 +542,7 @@ footer::before {
   font-weight: bold;
 }
 
+/* --- statistics --- */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));
@@ -539,6 +566,7 @@ footer::before {
   text-transform: lowercase;
 }
 
+/* --- fortunes --- */
 .fortune-box {
   padding: 0.625rem 0.9375rem;
   background: var(--search-bg);
@@ -556,6 +584,7 @@ footer::before {
   margin-right: 0.5rem;
 }
 
+/* --- build status --- */
 .status-ok { color: var(--status-ok); font-weight: bold; }
 .status-broken { color: var(--status-err); font-weight: bold; }
 .status-unmaintained { color: var(--status-unmaintained); font-weight: bold; opacity: 0.8; }
@@ -573,6 +602,7 @@ footer::before {
 .status-dot.failed { background-color: #dc3545; }
 .status-dot.none { background-color: #ccc; }
 
+/* --- dependencies --- */
 .dep-list {
   list-style: none;
   padding-left: 0.9375rem;
@@ -586,6 +616,7 @@ footer::before {
   position: relative;
 }
 
+/* item aesthetic */
 .dep-item::before {
   content: '*';
   position: absolute;
@@ -599,6 +630,7 @@ footer::before {
   font-size: 0.75rem;
 }
 
+/* --- layouts --- */
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -638,6 +670,7 @@ footer::before {
   color: var(--text);
 }
 
+/* --- distribution bars --- */
 .dist-row {
   display: flex;
   align-items: center;
@@ -675,6 +708,7 @@ footer::before {
   font-family: monospace;
 }
 
+/* --- activity charts --- */
 .activity-chart-container {
   overflow-x: auto;
   margin-bottom: 0.9375rem;
@@ -709,6 +743,7 @@ footer::before {
   cursor: crosshair;
 }
 
+/* --- ci data --- */
 .ci-data-box {
   background: var(--search-bg);
   border: 0.0625rem solid var(--search-border);
@@ -732,6 +767,7 @@ footer::before {
   font-size: 0.8125rem;
 }
 
+/* --- global helpers --- */
 .text-meta { color: var(--text-muted); font-size: 0.75rem; }
 .text-bold { font-weight: bold; }
 .text-tiny { font-size: 0.6875rem; font-family: monospace; }
@@ -754,6 +790,7 @@ footer::before {
   font-style: italic;
 }
 
+/* --- media queries --- */
 @media (max-width: 48rem) {
   .search-box input[type="text"] {
     width: 100%;
@@ -770,4 +807,137 @@ footer::before {
   .category-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* --- picon font --- */
+@font-face {
+  src: url(https://unpkg.com/picon);
+  font-family: picon;
+}
+
+/* explicit ligature settings */
+.picon { 
+    font-family: picon !important;
+    font-variant-ligatures: discretionary-ligatures !important;
+    -webkit-font-variant-ligatures: discretionary-ligatures !important;
+    font-feature-settings: "liga" 1, "dlig" 1 !important;
+    text-rendering: optimizeLegibility !important;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+/* --- microvt internal layers --- */
+.mvt-layer-g { position:absolute; top:0; left:0; width:100%; height:100%;
+  z-index:1; pointer-events:none; }
+.mvt-layer-t { position:relative; z-index:2; }
+.mvt-row { display:block; overflow:hidden; white-space:pre; background:transparent; }
+.mvt-img { position:absolute; pointer-events:none; image-rendering:pixelated; }
+
+/* --- sgr classes --- */
+.vt-b    { font-weight:bold; }
+.vt-i    { font-style:italic; }
+.vt-u    { text-decoration:underline; }
+.vt-s    { text-decoration:line-through; }
+.vt-blnk { animation:vt-blink 1s step-start infinite; }
+@keyframes vt-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+/* --- terminal viewer --- */
+#viewer-shell {
+    display: flex;
+    flex-direction: column;
+    height: 85vh;
+    border: 0.0625rem solid var(--nav-border);
+    margin: 1.25rem 0;
+    background: #000;
+}
+
+#viewer-header {
+    background: var(--header-bg);
+    border-bottom: 0.0625rem solid var(--header-border);
+    padding: 0.5rem 0.9375rem;
+    font-size: 0.8125rem;
+    color: var(--text);
+    display: flex;
+    justify-content: space-between;
+}
+
+#viewer-viewport {
+    flex: 1;
+    overflow: auto;
+    padding: 1.25rem;
+    background: #000;
+    color: #c8cdd8;
+    font-family: 'Courier New', monospace;
+}
+
+#viewer-term {
+    outline: none;
+}
+
+.static-viewer {
+    width: 100%;
+}
+
+/* prompt aesthetic */
+.terminal-cmd {
+    color: var(--status-ok);
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.terminal-content {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.embedded-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-top: 1rem;
+    image-rendering: pixelated;
+}
+
+/* --- picon composition --- */
+s.picon-compose {
+    position: relative;
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+/* explicit ligature settings */
+s.picon-compose .picon-parent {
+    font-family: picon !important;
+    font-variant-ligatures: discretionary-ligatures !important;
+    -webkit-font-variant-ligatures: discretionary-ligatures !important;
+    font-feature-settings: "liga" 1, "dlig" 1 !important;
+    display: block;
+    font-size: 1.2em;
+}
+
+/* overlay child icons */
+s.picon-compose .picon-child {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 0.55em;
+    font-family: picon !important;
+    color: var(--status-orange);
+    text-shadow: 
+        -1px -1px 0 var(--bg),
+         1px -1px 0 var(--bg),
+        -1px  1px 0 var(--bg),
+         1px  1px 0 var(--bg),
+         0px -1px 0 var(--bg),
+         0px  1px 0 var(--bg),
+        -1px  0px 0 var(--bg),
+         1px  0px 0 var(--bg);
+    line-height: 1;
+    font-weight: bold;
 }

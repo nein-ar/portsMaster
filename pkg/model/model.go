@@ -43,6 +43,8 @@ type Port struct {
 	IsUnmaintained bool          `cbor:"is_unmaintained" json:"is_unmaintained"`
 	CI             *CIInfo       `cbor:"ci,omitempty" json:"ci,omitempty"`
 	RecipeLines    int           `cbor:"recipe_lines" json:"recipe_lines"`
+	Files          []string          `cbor:"files,omitempty" json:"files,omitempty"`
+	FileContents   map[string]string `cbor:"file_contents,omitempty" json:"file_contents,omitempty"`
 }
 
 type CIInfo struct {
