@@ -8,79 +8,104 @@ import (
 )
 
 templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
-	@Layout("Statistics", data, cfg, currentPath) {
+	@Layout("statistics", data, cfg, currentPath) {
 		<div class="breadcrumb">
 			<a href={ Href(currentPath, "/") }>home</a> / stats
 		</div>
 
 		<div class="main-content">
-			<div class="section-header">Repository Dashboard</div>
-			
-			<div class="dashboard-grid">
-				<a href={ Href(currentPath, "/search/index.html?q=*") } class="stat-box clickable">
-					<span class="stat-label">Total Ports</span>
-					<span class="stat-value">{ fmt.Sprintf("%d", data.TotalPorts) }</span>
-				</a>
-				<div class="stat-box">
-					<span class="stat-label">Categories</span>
-					<span class="stat-value">{ fmt.Sprintf("%d", len(data.Categories)) }</span>
-				</div>
-				<a href={ Href(currentPath, "/search/index.html?q=is:updated") } class="stat-box clickable">
-					<span class="stat-label">Updated (7d)</span>
-					<div class="stat-value-container">
-						if data.TotalPorts > 0 {
-							<span class="text-meta mr-5">{ fmt.Sprintf("%.1f%%", float64(data.UpdatedThisWeek)/float64(data.TotalPorts)*100) }</span>
-						}
-						<span class="stat-value">{ fmt.Sprintf("%d", data.UpdatedThisWeek) }</span>
-					</div>
-				</a>
-				<a href={ Href(currentPath, "/search/index.html?q=is:new") } class="stat-box clickable">
-					<span class="stat-label">New Ports (30d)</span>
-					<span class="stat-value">{ fmt.Sprintf("%d", data.NewPortsCount) }</span>
-				</a>
-				<div class="stat-box">
-					<span class="stat-label">Total Commits</span>
-					<span class="stat-value">{ fmt.Sprintf("%d", data.TotalCommits) }</span>
-				</div>
-				<div class="stat-box">
-					<span class="stat-label">Build Success</span>
-					<div class="stat-value-container">
-						if data.BuildStats.Total > 0 {
-							<span class="stat-value status-ok">{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Success)/float64(data.BuildStats.Total)*100) }</span>
-						} else {
-							<span class="stat-value">-</span>
-						}
-					</div>
-				</div>
-				<a href={ Href(currentPath, "/search/index.html?q=is:broken") } class="stat-box clickable">
-					<span class="stat-label">Broken Ports</span>
-					<div class="stat-value-container">
-						if data.TotalPorts > 0 {
-							<span class="text-meta mr-5">{ fmt.Sprintf("%.1f%%", float64(data.BrokenCount)/float64(data.TotalPorts)*100) }</span>
-						}
-						<span class="stat-value status-broken">{ fmt.Sprintf("%d", data.BrokenCount) }</span>
-					</div>
-				</a>
-				<a href={ Href(currentPath, "/search/index.html?q=is:unmaintained") } class="stat-box clickable">
-					<span class="stat-label">Unmaintained</span>
-					<div class="stat-value-container">
-						if data.TotalPorts > 0 {
-							<span class="text-meta mr-5">{ fmt.Sprintf("%.1f%%", float64(data.UnmaintainedCount)/float64(data.TotalPorts)*100) }</span>
-						}
-						<span class="stat-value status-unmaintained opacity-1">{ fmt.Sprintf("%d", data.UnmaintainedCount) }</span>
-					</div>
-				</a>
-			</div>
+			<div class="section-header">repository summary</div>
+			<table>
+				<thead>
+					<tr>
+						<th>metric</th>
+						<th class="text-right">value</th>
+						<th class="text-right">share</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><a href={ Href(currentPath, "/search/index.html?q=*") }>total ports</a></td>
+						<td class="text-right">{ fmt.Sprintf("%d", data.TotalPorts) }</td>
+						<td class="text-right">100%</td>
+					</tr>
+					<tr>
+						<td>categories</td>
+						<td class="text-right">{ fmt.Sprintf("%d", len(data.Categories)) }</td>
+						<td class="text-right">-</td>
+					</tr>
+					<tr>
+						<td><a href={ Href(currentPath, "/search/index.html?q=is:updated") }>updated (7d)</a></td>
+						<td class="text-right">{ fmt.Sprintf("%d", data.UpdatedThisWeek) }</td>
+						<td class="text-right">
+							if data.TotalPorts > 0 {
+								{ fmt.Sprintf("%.1f%%", float64(data.UpdatedThisWeek)/float64(data.TotalPorts)*100) }
+							} else {
+								-
+							}
+						</td>
+					</tr>
+					<tr>
+						<td><a href={ Href(currentPath, "/search/index.html?q=is:new") }>new ports (30d)</a></td>
+						<td class="text-right">{ fmt.Sprintf("%d", data.NewPortsCount) }</td>
+						<td class="text-right">
+							if data.TotalPorts > 0 {
+								{ fmt.Sprintf("%.1f%%", float64(data.NewPortsCount)/float64(data.TotalPorts)*100) }
+							} else {
+								-
+							}
+						</td>
+					</tr>
+					<tr>
+						<td>total commits</td>
+						<td class="text-right">{ fmt.Sprintf("%d", data.TotalCommits) }</td>
+						<td class="text-right">-</td>
+					</tr>
+					<tr>
+						<td><a href={ Href(currentPath, "/search/index.html?q=is:broken") }>broken ports</a></td>
+						<td class="text-right status-broken">{ fmt.Sprintf("%d", data.BrokenCount) }</td>
+						<td class="text-right">
+							if data.TotalPorts > 0 {
+								{ fmt.Sprintf("%.1f%%", float64(data.BrokenCount)/float64(data.TotalPorts)*100) }
+							} else {
+								-
+							}
+						</td>
+					</tr>
+					<tr>
+						<td><a href={ Href(currentPath, "/search/index.html?q=is:unmaintained") }>unmaintained</a></td>
+						<td class="text-right status-unmaintained opacity-1">{ fmt.Sprintf("%d", data.UnmaintainedCount) }</td>
+						<td class="text-right">
+							if data.TotalPorts > 0 {
+								{ fmt.Sprintf("%.1f%%", float64(data.UnmaintainedCount)/float64(data.TotalPorts)*100) }
+							} else {
+								-
+							}
+						</td>
+					</tr>
+					<tr>
+						<td>build success</td>
+						<td class="text-right">
+							if data.BuildStats.Total > 0 {
+								<span class="status-ok">{ fmt.Sprintf("%.1f%%", float64(data.BuildStats.Success)/float64(data.BuildStats.Total)*100) }</span>
+							} else {
+								-
+							}
+						</td>
+						<td class="text-right">{ fmt.Sprintf("%d/%d", data.BuildStats.Success, data.BuildStats.Total) }</td>
+					</tr>
+				</tbody>
+			</table>
 
 			<div class="two-col">
 				<div class="stats-left">
-					<div class="section-header">Category Distribution</div>
+					<div class="section-header">category distribution</div>
 					<table>
 						<thead>
 							<tr>
-								<th>Category</th>
-								<th class="text-right">Count</th>
-								<th>Distribution</th>
+								<th>category</th>
+								<th class="text-right">count</th>
+								<th>distribution</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -105,12 +130,12 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 						</tbody>
 					</table>
 
-					<div class="section-header mt-30">License Distribution</div>
+					<div class="section-header mt-30">license distribution</div>
 					<table>
 						<thead>
 							<tr>
-								<th>License</th>
-								<th class="text-right">Count</th>
+								<th>license</th>
+								<th class="text-right">count</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -128,11 +153,11 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 						</tbody>
 					</table>
 
-					<div class="section-header mt-30">Build Statistics</div>
+					<div class="section-header mt-30">build statistics</div>
 					<table>
 						<tbody>
 							<tr>
-								<td>Successful Builds</td>
+								<td>successful builds</td>
 								<td class="text-right">
 									if data.BuildStats.Total > 0 {
 										<span class="text-meta mr-5">
@@ -143,7 +168,7 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 								</td>
 							</tr>
 							<tr>
-								<td>Failed Builds</td>
+								<td>failed builds</td>
 								<td class="text-right">
 									if data.BuildStats.Total > 0 {
 										<span class="text-meta mr-5">
@@ -154,7 +179,7 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 								</td>
 							</tr>
 							<tr>
-								<td>Total Builds Attempted</td>
+								<td>total builds attempted</td>
 								<td class="text-right">
 									if data.TotalPorts > 0 {
 										<span class="text-meta mr-5">
@@ -166,11 +191,11 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 							</tr>
 							if data.BuildStats.AvgTime > 0 {
 								<tr>
-									<td>Average Build Time</td>
+									<td>average build time</td>
 									<td class="text-right"><strong>{ util.FormatDuration(data.BuildStats.AvgTime) }</strong></td>
 								</tr>
 								<tr>
-									<td>Total Build Effort</td>
+									<td>total build effort</td>
 									<td class="text-right"><strong>{ util.FormatDuration(data.BuildStats.TotalTime) }</strong></td>
 								</tr>
 							}
@@ -179,7 +204,7 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 				</div>
 
 				<div class="stats-right">
-					<div class="section-header">Commit Activity (History)</div>
+					<div class="section-header">commit activity (history)</div>
 					<div class="activity-chart-container">
 						<div class="activity-chart">
 							for _, day := range data.DailyStats {
@@ -190,14 +215,14 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 							}
 						</div>
 					</div>
-					<p class="text-meta">Showing activity over time. Each bar represents one day.</p>
+					<p class="text-meta">showing activity over time. each bar represents one day.</p>
 
-					<div class="section-header mt-30">Top Contributors</div>
+					<div class="section-header mt-30">top contributors</div>
 					<table>
 						<thead>
 							<tr>
-								<th>Contributor</th>
-								<th class="text-right">Commits</th>
+								<th>contributor</th>
+								<th class="text-right">commits</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -223,18 +248,18 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 						</tbody>
 					</table>
 
-					<div class="section-header mt-30">Recipe Complexity</div>
+					<div class="section-header mt-30">recipe complexity</div>
 					<p class="text-meta">
-						Lines in build scripts. Total: { fmt.Sprintf("%d", data.TotalRecipeLines) }.
+						lines in build scripts. total: { fmt.Sprintf("%d", data.TotalRecipeLines) }.
 						if data.Top5LinePercentage > 0 {
-							Top 5: { fmt.Sprintf("%.1f%%", data.Top5LinePercentage) }.
+							top 5: { fmt.Sprintf("%.1f%%", data.Top5LinePercentage) }.
 						}
 					</p>
 					<table>
 						<thead>
 							<tr>
-								<th>Port</th>
-								<th class="text-right">Lines</th>
+								<th>port</th>
+								<th class="text-right">lines</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -257,7 +282,7 @@ templ Stats(data *model.SiteData, cfg *config.Config, currentPath string) {
 			</div>
 			
 			<div class="stats-footer mt-30">
-				<p class="text-meta">Last updated: { util.FormatTime(data.LastUpdate) }</p>
+				<p class="text-meta">last updated: { util.FormatTime(data.LastUpdate) }</p>
 			</div>
 		</div>
 		<script>

@@ -8,25 +8,16 @@ import (
 	)
 templ Home(data *model.SiteData, recent []*model.Port, cfg *config.Config, currentPath string) {
 	@Layout(cfg.Title, data, cfg, currentPath) {
-		<div class="quick-links">
-			<h3>Quick Links</h3>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:new")) }>New Ports (last 30 days)</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:updated")) }>Recently Updated</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:broken")) }>Build Failures</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/search/index.html?q=is:unmaintained")) }>Unmaintained</a>
-			<a href={ templ.SafeURL(Href(currentPath, "/feed.xml")) }>RSS Feed</a>
-		</div>
+		<div class="section-header">recent port updates</div>
 
-		<div class="section-header">Recent Port Updates</div>
-
-		<table>
+		<table class="recent-updates">
 			<thead>
 				<tr>
-					<th>Port</th>
-					<th>Version</th>
-					<th>Category</th>
-					<th>Description</th>
-					<th>Updated</th>
+					<th>port</th>
+					<th>version</th>
+					<th>category</th>
+					<th>description</th>
+					<th>updated</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -55,7 +46,7 @@ templ Home(data *model.SiteData, recent []*model.Port, cfg *config.Config, curre
 			</tbody>
 		</table>
 
-		<div class="section-header">Categories</div>
+		<div class="section-header">categories</div>
 		<div class="category-grid">
 			for _, c := range data.Categories {
 				<div class="category-box">
@@ -65,7 +56,7 @@ templ Home(data *model.SiteData, recent []*model.Port, cfg *config.Config, curre
 			}
 		</div>
 
-		<div class="section-header">Recent Commits</div>
+		<div class="section-header">recent commits</div>
 		<div class="commit-log">
 			for i, c := range data.RecentCommits {
 				if i < 5 {
