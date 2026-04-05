@@ -7,13 +7,13 @@ import (
 )
 
 templ CategoryList(data *model.SiteData, cfg *config.Config, currentPath string) {
-	@Layout("Categories", data, cfg, currentPath) {
+	@Layout("categories", data, cfg, currentPath) {
 		<div class="breadcrumb">
 			<a href={ Href(currentPath, "/") }>home</a> / categories
 		</div>
 
 		<div class="main-content">
-			<div class="section-header">All Categories</div>
+			<div class="section-header">all categories</div>
 			<div class="category-grid">
 				for _, c := range data.Categories {
 					<div class="category-box">

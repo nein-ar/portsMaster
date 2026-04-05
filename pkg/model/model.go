@@ -25,6 +25,7 @@ type PackageInfo struct {
 
 type Port struct {
 	Name           string        `cbor:"name" json:"name"`
+	DisplayName    string        `cbor:"display_name,omitempty" json:"display_name,omitempty"`
 	Category       string        `cbor:"category" json:"category"`
 	Description    string        `cbor:"description" json:"description"`
 	Version        string        `cbor:"version" json:"version"`

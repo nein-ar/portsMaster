@@ -180,6 +180,8 @@ func parseInfoFile(p *model.Port, path string) error {
 		val := strings.TrimSpace(parts[1])
 
 		switch key {
+		case "name":
+			p.DisplayName = val
 		case "version":
 			p.Version = val
 		case "release":

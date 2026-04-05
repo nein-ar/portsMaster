@@ -1,65 +1,23 @@
 :root {
-  --bg: #0a0000;
-  --text: #f5d4d2;
-  --text-muted: #d9a8a5;
-  --text-dim: #b88683;
-  --text-dark: #d3a6a6;
-  --link: #ffc9c5;
-  --link-visited: #d9a8a5;
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Liberation Mono", "DejaVu Sans Mono", monospace;
 
-  /* Structural elements */
-  --header-bg: #1a0505;
-  --header-border: #ff6b63;
+  --bg: #6f1a1f;
+  --surface: #6f1a1f;
+  --surface-subtle: rgba(255, 255, 255, 0.04);
 
-  --nav-bg: #52201C;
-  --nav-border: #ff6b63;
+  --text: #f4f0f0;
+  --text-soft: #e7caca;
 
-  /* Interactive elements */
-  --search-bg: #1a0505;
-  --search-border: #d94d45;
-  --input-bg: #2a0808;
-  --input-border: #ff6b63;
-  --btn-bg: #52201C;
-  --btn-border: #ff6b63;
-  --btn-hover-bg: #ff6b63;
+  --link: #ffd7d9;
+  --link-hover: #5e0707;
+  --link-hover-bg: #ffffff;
 
-  /* Stats and data */
-  --stats-bg: #0a0000;
-  --stats-border: #d94d45;
+  --line: rgba(255, 255, 255, 0.9);
+  --line-soft: rgba(255, 255, 255, 0.7);
+  --line-strong: rgba(255, 255, 255, 1);
 
-  /* Tables */
-  --table-bg: #0a0000;
-  --table-header-bg: #52201C;
-  --table-border: #d94d45;
-  --table-border-light: #5A3A37;
-  --table-hover: #2a0808;
-
-  /* Code/commits */
-  --commit-border: #d94d45;
-  --commit-hash-bg: #2a0808;
-
-  /* Footer */
-  --footer-bg: #52201C;
-  --footer-border: #ff6b63;
-
-  /* Boxes and containers */
-  --box-bg: #1a0505;
-  --box-border: #d94d45;
-  --box-shadow: rgba(255, 107, 99, 0.2);
-
-  /* Progress/charts */
-  --bar-bg: #2a0808;
-  --bar-fill: #ff6b63;
-
-  --chart-bg: #0a0000;
-  --chart-bar: #ff6b63;
-  --chart-bar-hover: #ff8278;
-
-  --highlight: #ff6b6333;
-
-  /* Status indicators */
-  --status-ok: #ff6b63;
-  --status-err: #ff3b33;
-  --status-unmaintained: #a33a34;
+  --accent: #ffd7d9;
+  --accent-strong: #ffffff;
+  --highlight: rgba(255, 255, 255, 0.22);
 }
-

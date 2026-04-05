@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //
     function render(filtered) {
         if (!filtered || filtered.length === 0) {
-            container.innerHTML = '<p class="p-20 text-center">No matching commits found.</p>';
+            container.innerHTML = '<p class="p-20 text-center">no matching commits found.</p>';
             return;
         }
 

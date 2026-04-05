@@ -31,8 +31,18 @@ templ Header(title string, cfg *config.Config, currentPath string) {
 
 templ Nav(cfg *config.Config, currentPath string) {
 	<header>
-		<h1>{ cfg.HeaderTitle }</h1>
-		<p>{ cfg.Subtitle }</p>
+		<div class="top-bar">
+			<a href="https://wayland.fyi">wl.fyi</a>
+			<span>|</span>
+			<a href="https://9larp.net">9larp</a>
+			<span>|</span>
+			<a href="https://derivelinux.org">main</a>
+			<span>|</span>
+			<a href="https://pkg.derivelinux.org">pkg</a>
+		</div>
+		<a href={ Href(currentPath, "/") } class="site-mark" aria-label={ cfg.HeaderTitle }>
+			<img src={ Href(currentPath, cfg.AssetURL("header.jpg")) } alt={ cfg.HeaderTitle } class="site-mark-image"/>
+		</a>
 	</header>
 
 	<nav>
@@ -83,7 +93,6 @@ templ Layout(title string, data *model.SiteData, cfg *config.Config, currentPath
 				@StatsBar(data)
 			}
 			<main class="main-content">
-				@FortuneBox()
 				{ children... }
 			</main>
 			@Footer(cfg, currentPath)
