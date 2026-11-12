@@ -1,0 +1,176 @@
+{{ $ports := .Site.Data.ports }}
+{{ $p := index $ports.by_key .Page.Params.key }}
+{{ with $p }}
+<div class="port-header">
+	<h2 class="port-title">{{ default .name .display_name }} <span class="port-version">{{ .version }}</span></h2>
+	<p class="port-desc">{{ .description }}</p>
+	<p class="port-meta-row">
+		<a href="{{ href $.Page.Path (printf "/categories/%s/index.html" .category) }}" class="category-link">/{{ .category }}</a>
+		{{ if gt .recipe_lines 0 }}
+		<span> | recipe: {{ .recipe_lines }} lines</span>
+		{{ end }}
+		{{ if .license }}
+		<span> | license: {{ .license }}</span>
+		{{ end }}
+		{{ if .hash }}
+		<span class="text-meta"> | hash: <code class="text-tiny">{{ printf "%.12s" .hash }}...</code></span>
+		{{ end }}
+	</p>
+</div>
+
+<div class="two-col">
+	<div class="metadata-section">
+		<div class="section-header">metadata</div>
+		<div class="port-info">
+			<p><strong>maintainer:</strong>
+				{{ if .is_unmaintained }}
+				<span class="status-unmaintained">unmaintained</span>
+				{{ else }}
+				{{ .maintainer }}
+				{{ end }}
+			</p>
+			{{ if .upstream }}
+			<p> | <strong>upstream:</strong> <a href="{{ .upstream }}">{{ .upstream }}</a></p>
+			{{ end }}
+			<p> | <strong>package path:</strong> <code class="text-tiny">{{ .category }}/{{ .name }}</code></p>
+			{{ if .provides }}
+			<p> | <strong>provides:</strong>
+				{{ range $i, $prov := .provides }}
+				<span class="text-bold">{{ $prov }}</span>{{ if lt (add $i 1) (len $p.provides) }}<span>, </span>{{ end }}
+				{{ end }}
+			</p>
+			{{ end }}
+		</div>
+
+		<div class="section-header mt-30">dependencies</div>
+		{{ if .deps }}
+		<ul class="dep-list">
+			{{ range .deps }}
+			<li class="dep-item">
+				{{ $depKey := index $ports.by_name .name }}
+				{{ if $depKey }}
+				{{ $dp := index $ports.by_key $depKey }}
+				<a href="{{ href $.Page.Path (printf "/ports/%s/%s/index.html" $dp.category $dp.name) }}" class="text-bold">{{ .name }}</a>
+				{{ else }}
+				<span class="text-bold">{{ .name }}</span>
+				{{ end }}
+				{{ if eq .type "build" }}
+				<span class="dep-type"> [build]</span>
+				{{ else if eq .type "run" }}
+				<span class="dep-type"> [run]</span>
+				{{ else if eq .type "link" }}
+				<span class="dep-type"> [link]</span>
+				{{ end }}
+			</li>
+			{{ end }}
+		</ul>
+		{{ else }}
+		<p class="text-meta">no dependencies.</p>
+		{{ end }}
+
+		{{ if .packages }}
+		<div class="section-header mt-30">binary packages</div>
+		<table>
+			<thead>
+				<tr>
+					<th>package file</th>
+					<th class="text-right">size</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{ range .packages }}
+				<tr>
+					<td class="text-tiny">{{ .filename }}</td>
+					<td class="text-right text-tiny">{{ formatBytes .size }}</td>
+				</tr>
+				{{ end }}
+			</tbody>
+		</table>
+		{{ end }}
+
+		{{ if .files }}
+		<div class="section-header mt-30">files</div>
+		<ul class="dep-list">
+			{{ range .files }}
+			{{ if ne .name "ci_log.txt" }}
+			<li class="dep-item">
+				{{ template "partials/file-icon.html" (dict "name" .name) }}
+				{{ if .url }}
+				<a href="{{ href $.Page.Path .url }}" target="_blank">{{ .name }}</a>
+				{{ else }}
+				<span>{{ .name }}</span>
+				{{ end }}
+			</li>
+			{{ end }}
+			{{ end }}
+		</ul>
+		{{ end }}
+	</div>
+
+	<div class="ci-section">
+		<div class="section-header">ci &amp; build status</div>
+		{{ if .ci }}
+		<div class="ci-data-box">
+			<div class="stat-row">
+				<span>status</span>
+				<div class="flex-center">
+					{{ if eq .ci.status "success" }}
+					<strong class="status-ok">success</strong>
+					{{ else if eq .ci.status "failed" }}
+					<strong class="status-broken">failed</strong>
+					{{ else }}
+					<strong class="status-orange">{{ .ci.status }}</strong>
+					{{ end }}
+					{{ if $p.log_url }}
+					<a href="{{ href $.Page.Path $p.log_url }}" class="ml-10 text-tiny" target="_blank">[log]</a>
+					{{ end }}
+				</div>
+			</div>
+			<div class="stat-row">
+				<span>duration</span>
+				<strong>{{ formatDuration .ci.build_duration }}</strong>
+			</div>
+			<div class="stat-row">
+				<span>global share (commits)</span>
+				<div class="flex-center">
+					{{ if gt $.Site.Data.site.total_commits 0 }}
+					<span class="text-meta mr-5">{{ printf "%.2f%%" .commit_share }}</span>
+					{{ end }}
+					<strong>{{ len $p.commits }}</strong>
+				</div>
+			</div>
+			<div class="stat-row">
+				<span>global share (lines)</span>
+				<div class="flex-center">
+					{{ if gt $.Site.Data.site.total_recipe_lines 0 }}
+					<span class="text-meta mr-5">{{ printf "%.2f%%" .line_share }}</span>
+					{{ end }}
+					<strong>{{ $p.recipe_lines }}</strong>
+				</div>
+			</div>
+			<div class="stat-row">
+				<span>package size</span>
+				<strong>{{ formatBytes .ci.size }} ({{ formatBytes .ci.installed_size }})</strong>
+			</div>
+			<div class="stat-row">
+				<span>installed size</span>
+				<strong>{{ formatBytes .ci.total_size }} ({{ formatBytes .ci.total_installed }})</strong>
+			</div>
+		</div>
+		{{ else }}
+		<p class="text-meta">no ci data available for this port.</p>
+		{{ end }}
+
+		{{ if .commits }}
+		<div class="section-header mt-30">recent changes</div>
+		<div class="commit-log">
+			{{ range $i, $c := .commits }}
+			{{ if lt $i 3 }}
+			{{ template "partials/commit-entry.html" (dict "commit" $c "site" $.Site) }}
+			{{ end }}
+			{{ end }}
+		</div>
+		{{ end }}
+	</div>
+</div>
+{{ end }}

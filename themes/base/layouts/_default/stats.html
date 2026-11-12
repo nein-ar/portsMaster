@@ -1,0 +1,268 @@
+{{ $s := .Site.Data.site }}
+<div class="breadcrumb">
+	<a href="{{ href .Page.Path "/index.html" }}">home</a> / stats
+</div>
+
+<div class="main-content">
+	<div data-theme-only="xplshn">
+<div class="section-header">Repository Dashboard</div>
+
+	<div class="dashboard-grid">
+		<a href="{{ href .Page.Path "/search/index.html?q=*" }}" class="stat-box clickable">
+			<span class="stat-label">Total Ports</span>
+			<span class="stat-value">{{ $s.total_ports }}</span>
+		</a>
+		<div class="stat-box">
+			<span class="stat-label">Categories</span>
+			<span class="stat-value">{{ len $s.categories }}</span>
+		</div>
+		<a href="{{ href .Page.Path "/search/index.html?q=is:updated" }}" class="stat-box clickable">
+			<span class="stat-label">Updated (7d)</span>
+			<div class="stat-value-container">
+				{{ if gt $s.total_ports 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $s.updated_this_week $s.total_ports) }}</span>{{ end }}
+				<span class="stat-value">{{ $s.updated_this_week }}</span>
+			</div>
+		</a>
+		<a href="{{ href .Page.Path "/search/index.html?q=is:new" }}" class="stat-box clickable">
+			<span class="stat-label">New Ports (30d)</span>
+			<span class="stat-value">{{ $s.new_ports_count }}</span>
+		</a>
+		<div class="stat-box">
+			<span class="stat-label">Total Commits</span>
+			<span class="stat-value">{{ $s.total_commits }}</span>
+		</div>
+		<div class="stat-box">
+			<span class="stat-label">Build Success</span>
+			<div class="stat-value-container">
+				{{ if gt $s.build.total 0 }}<span class="stat-value status-ok">{{ printf "%.1f%%" (percent $s.build.success $s.build.total) }}</span>{{ else }}<span class="stat-value">-</span>{{ end }}
+			</div>
+		</div>
+		<a href="{{ href .Page.Path "/search/index.html?q=is:broken" }}" class="stat-box clickable">
+			<span class="stat-label">Broken Ports</span>
+			<div class="stat-value-container">
+				{{ if gt $s.total_ports 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $s.broken_count $s.total_ports) }}</span>{{ end }}
+				<span class="stat-value status-broken">{{ $s.broken_count }}</span>
+			</div>
+		</a>
+		<a href="{{ href .Page.Path "/search/index.html?q=is:unmaintained" }}" class="stat-box clickable">
+			<span class="stat-label">Unmaintained</span>
+			<div class="stat-value-container">
+				{{ if gt $s.total_ports 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $s.unmaintained_count $s.total_ports) }}</span>{{ end }}
+				<span class="stat-value status-unmaintained opacity-1">{{ $s.unmaintained_count }}</span>
+			</div>
+		</a>
+	</div>
+	</div>
+
+	<div data-theme-only="shrub">
+	<div class="section-header">repository summary</div>
+	<table>
+		<thead>
+			<tr>
+				<th>metric</th>
+				<th class="text-right">value</th>
+				<th class="text-right">share</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><a href="{{ href .Page.Path "/search/index.html?q=*" }}">total ports</a></td>
+				<td class="text-right">{{ $s.total_ports }}</td>
+				<td class="text-right">100%</td>
+			</tr>
+			<tr>
+				<td>categories</td>
+				<td class="text-right">{{ len $s.categories }}</td>
+				<td class="text-right">-</td>
+			</tr>
+			<tr>
+				<td><a href="{{ href .Page.Path "/search/index.html?q=is:updated" }}">updated (7d)</a></td>
+				<td class="text-right">{{ $s.updated_this_week }}</td>
+				<td class="text-right">{{ if gt $s.total_ports 0 }}{{ printf "%.1f%%" (percent $s.updated_this_week $s.total_ports) }}{{ else }}-{{ end }}</td>
+			</tr>
+			<tr>
+				<td><a href="{{ href .Page.Path "/search/index.html?q=is:new" }}">new ports (30d)</a></td>
+				<td class="text-right">{{ $s.new_ports_count }}</td>
+				<td class="text-right">{{ if gt $s.total_ports 0 }}{{ printf "%.1f%%" (percent $s.new_ports_count $s.total_ports) }}{{ else }}-{{ end }}</td>
+			</tr>
+			<tr>
+				<td>total commits</td>
+				<td class="text-right">{{ $s.total_commits }}</td>
+				<td class="text-right">-</td>
+			</tr>
+			<tr>
+				<td><a href="{{ href .Page.Path "/search/index.html?q=is:broken" }}">broken ports</a></td>
+				<td class="text-right status-broken">{{ $s.broken_count }}</td>
+				<td class="text-right">{{ if gt $s.total_ports 0 }}{{ printf "%.1f%%" (percent $s.broken_count $s.total_ports) }}{{ else }}-{{ end }}</td>
+			</tr>
+			<tr>
+				<td><a href="{{ href .Page.Path "/search/index.html?q=is:unmaintained" }}">unmaintained</a></td>
+				<td class="text-right status-unmaintained opacity-1">{{ $s.unmaintained_count }}</td>
+				<td class="text-right">{{ if gt $s.total_ports 0 }}{{ printf "%.1f%%" (percent $s.unmaintained_count $s.total_ports) }}{{ else }}-{{ end }}</td>
+			</tr>
+			<tr>
+				<td>build success</td>
+				<td class="text-right">{{ if gt $s.build.total 0 }}<span class="status-ok">{{ printf "%.1f%%" (percent $s.build.success $s.build.total) }}</span>{{ else }}-{{ end }}</td>
+				<td class="text-right">{{ $s.build.success }}/{{ $s.build.total }}</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+
+	<div class="two-col">
+		<div class="stats-left">
+			<div class="section-header">category distribution</div>
+			<table>
+				<thead>
+					<tr>
+						<th>category</th>
+						<th class="text-right">count</th>
+						<th>distribution</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range $s.categories }}
+					{{ if gt .count 0 }}
+					<tr>
+						<td><a href="{{ href $.Page.Path (printf "/categories/%s/index.html" .name) }}">{{ .name }}</a></td>
+						<td class="text-right">
+							<span class="text-meta mr-5">{{ printf "%.1f%%" (percent .count $s.total_ports) }}</span>
+							{{ .count }}
+						</td>
+						<td class="w-100p">
+							<div class="dist-bar-bg m-0">
+								<div class="dist-bar-fill js-width-bar" data-width="{{ printf "%.1f%%" (percent .count $s.total_ports) }}"></div>
+							</div>
+						</td>
+					</tr>
+					{{ end }}
+					{{ end }}
+				</tbody>
+			</table>
+
+			<div class="section-header mt-30">license distribution</div>
+			<table>
+				<thead>
+					<tr>
+						<th>license</th>
+						<th class="text-right">count</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range $license, $count := $s.license_stats }}
+					<tr>
+						<td>{{ $license }}</td>
+						<td class="text-right">
+							<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $count $s.total_ports) }}</span>
+							{{ $count }}
+						</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+
+			<div class="section-header mt-30">build statistics</div>
+			<table>
+				<tbody>
+					<tr>
+						<td>successful builds</td>
+						<td class="text-right">
+							{{ if gt $s.build.total 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $s.build.success $s.build.total) }}</span>{{ end }}
+							<strong class="status-ok">{{ $s.build.success }}</strong>
+						</td>
+					</tr>
+					<tr>
+						<td>failed builds</td>
+						<td class="text-right">
+							{{ if gt $s.build.total 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $s.build.failed $s.build.total) }}</span>{{ end }}
+							<strong class="status-broken">{{ $s.build.failed }}</strong>
+						</td>
+					</tr>
+					<tr>
+						<td>total builds attempted</td>
+						<td class="text-right">
+							{{ if gt $s.total_ports 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent $s.build.total $s.total_ports) }}</span>{{ end }}
+							<strong>{{ $s.build.total }}</strong>
+						</td>
+					</tr>
+					{{ if gt $s.build.avg_time 0 }}
+					<tr>
+						<td>average build time</td>
+						<td class="text-right"><strong>{{ formatDuration $s.build.avg_time }}</strong></td>
+					</tr>
+					<tr>
+						<td>total build effort</td>
+						<td class="text-right"><strong>{{ formatDuration $s.build.total_time }}</strong></td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="stats-right">
+			<div class="section-header">commit activity (history)</div>
+			<div class="activity-chart-container">
+				<div class="activity-chart">
+					{{ range $s.daily }}
+					<div title="{{ .date }}: {{ .count }} commits" class="activity-bar js-height-bar" data-height="{{ min 100 (div (mul .count 100) $s.max_daily_commits) }}%"></div>
+					{{ end }}
+				</div>
+			</div>
+			<p class="text-meta">showing activity over time. each bar represents one day.</p>
+
+			<div class="section-header mt-30">top contributors</div>
+			<table>
+				<thead>
+					<tr>
+						<th>contributor</th>
+						<th class="text-right">commits</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range $s.contributors }}
+					<tr>
+						<td>
+							<a href="{{ href $.Page.Path (printf "/search/index.html?q=author:%s" (urlquery .name)) }}" title="{{ .tooltip }}" class="text-bold contributor-name">{{ .name }}</a>
+						</td>
+						<td class="text-right">
+							{{ if gt $s.total_commits 0 }}<span class="text-meta mr-5">{{ printf "%.1f%%" (percent .count $s.total_commits) }}</span>{{ end }}
+							{{ .count }}
+						</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+
+			<div class="section-header mt-30">recipe complexity</div>
+			<p class="text-meta">
+				lines in build scripts. total: {{ $s.total_recipe_lines }}.
+				{{ if $s.top5_line_percent }}top 5: {{ printf "%.1f%%" $s.top5_line_percent }}.{{ end }}
+			</p>
+			<table>
+				<thead>
+					<tr>
+						<th>port</th>
+						<th class="text-right">lines</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range $s.top_recipes }}
+					{{ if gt .recipe_lines 0 }}
+					<tr>
+						<td><a href="{{ href $.Page.Path (printf "/ports/%s/%s/index.html" .category .name) }}">{{ .name }}</a></td>
+						<td class="text-right">
+							<span class="text-meta mr-5">{{ printf "%.1f%%" .line_percent }}</span>
+							{{ .recipe_lines }}
+						</td>
+					</tr>
+					{{ end }}
+					{{ end }}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="stats-footer mt-30">
+		<p class="text-meta">last updated: {{ formatTime $s.last_update }}</p>
+	</div>
+</div>

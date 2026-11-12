@@ -1,0 +1,32 @@
+[hidden] {
+  display: none !important;
+}
+
+html[data-theme="shrub"] [data-theme-only="xplshn"],
+html[data-theme="xplshn"] [data-theme-only="shrub"] {
+  display: none !important;
+}
+
+.theme-switcher {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* quick dip when the visitor switches, like a terminal refresh */
+@keyframes theme-blip {
+  0% { opacity: 1; }
+  40% { opacity: 0.65; }
+  100% { opacity: 1; }
+}
+
+html.theme-swap body {
+  animation: theme-blip 110ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-swap body {
+    animation: none;
+  }
+}

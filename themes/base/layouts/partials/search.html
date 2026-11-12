@@ -1,0 +1,12 @@
+<form class="search-box" action="{{ href .Page.Path "/search/index.html" }}" method="GET">
+	<input type="text" name="q" placeholder="search ports..."/>
+	<select name="cat">
+		<option value="">all categories</option>
+		{{ with .Site.Data.site }}
+		{{ range .categories }}
+		<option value="{{ .name }}">{{ .name }}</option>
+		{{ end }}
+		{{ end }}
+	</select>
+	<input type="submit" value="search"/>
+</form>

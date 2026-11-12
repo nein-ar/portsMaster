@@ -1,0 +1,30 @@
+{{ $filename := .Page.Params.filename }}
+{{ $key := .Page.Params.key }}
+{{ $isImg := .Page.Params.is_image }}
+{{ $files := index .Site.Data.portfiles $key }}
+{{ $content := index $files $filename }}
+{{ $p := index .Site.Data.ports.by_key $key }}
+<div id="viewer-shell">
+	<div id="viewer-header">
+		<span>{{ $p.category }}/{{ $p.name }}/{{ $filename }}</span>
+	</div>
+	<div id="viewer-viewport">
+		{{ if eq $filename "ci_log.txt" }}
+		<div id="viewer-term" tabindex="0"></div>
+		{{ $payload := dict "filename" $filename "content" $content "isImg" $isImg }}
+		<script id="embedded-content" type="application/json">{{ safeJS (json $payload) }}</script>
+		<script src="{{ href .Page.Path (asset "assets/microvt.js") }}"></script>
+		<script src="{{ href .Page.Path (asset "assets/viewer.js") }}"></script>
+		{{ else if $isImg }}
+		<div class="static-viewer">
+			<pre class="terminal-cmd">$ eimg --input ./{{ $filename }}</pre>
+			<img src="{{ safeURL $content }}" alt="{{ $filename }}" class="embedded-img"/>
+		</div>
+		{{ else }}
+		<div class="static-viewer">
+			<pre class="terminal-cmd">$ cat {{ $filename }}</pre>
+			<pre class="terminal-content">{{ $content }}</pre>
+		</div>
+		{{ end }}
+	</div>
+</div>

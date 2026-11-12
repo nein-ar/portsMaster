@@ -1,0 +1,70 @@
+{{ $site := .Site.Data.site }}
+{{ $ports := .Site.Data.ports }}
+<div class="quick-links" data-theme-only="xplshn">
+	<h3>Quick Links</h3>
+	<a href="{{ href .Page.Path "/search/index.html?q=is:new" }}">New Ports (last 30 days)</a>
+	<a href="{{ href .Page.Path "/search/index.html?q=is:updated" }}">Recently Updated</a>
+	<a href="{{ href .Page.Path "/search/index.html?q=is:broken" }}">Build Failures</a>
+	<a href="{{ href .Page.Path "/search/index.html?q=is:unmaintained" }}">Unmaintained</a>
+	<a href="{{ href .Page.Path "/feed.xml" }}">RSS Feed</a>
+</div>
+
+<div class="section-header">recent port updates</div>
+
+<table class="recent-updates">
+	<thead>
+		<tr>
+			<th>port</th>
+			<th>version</th>
+			<th>category</th>
+			<th>description</th>
+			<th>updated</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{ range $key := $site.recent }}
+		{{ $p := index $ports.by_key $key }}
+		{{ with $p }}
+		<tr>
+			<td>
+				<div class="flex-center">
+					{{ template "partials/ci-status.html" . }}
+					<a href="{{ href $.Page.Path (printf "/ports/%s/%s/index.html" .category .name) }}" class="port-name">{{ .name }}</a>
+				</div>
+			</td>
+			<td class="version">{{ .version }}</td>
+			<td><a href="{{ href $.Page.Path (printf "/categories/%s/index.html" .category) }}" class="category-link">/{{ .category }}</a></td>
+			<td>{{ .description }}</td>
+			{{ if .last_commit }}
+				{{ if within .last_commit.date "24h" }}
+			<td class="updated-recent">{{ timeAgo .last_commit.date }}</td>
+				{{ else }}
+			<td>{{ timeAgo .last_commit.date }}</td>
+				{{ end }}
+			{{ else }}
+			<td>-</td>
+			{{ end }}
+		</tr>
+		{{ end }}
+		{{ end }}
+	</tbody>
+</table>
+
+<div class="section-header">categories</div>
+<div class="category-grid">
+	{{ range $site.categories }}
+	<div class="category-box">
+		<a href="{{ href $.Page.Path (printf "/categories/%s/index.html" .name) }}">{{ .name }}</a><br/>
+		<span class="count">{{ plural .count "port" }}</span>
+	</div>
+	{{ end }}
+</div>
+
+<div class="section-header">recent commits</div>
+<div class="commit-log">
+	{{ range $i, $c := .Site.Data.commits }}
+	{{ if lt $i 5 }}
+	{{ template "partials/commit-entry.html" (dict "commit" $c "site" $.Site) }}
+	{{ end }}
+	{{ end }}
+</div>

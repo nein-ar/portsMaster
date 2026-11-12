@@ -1,0 +1,18 @@
+{{ $c := .commit }}
+{{ $site := .site }}
+<div class="commit-entry">
+	<div class="commit-header">
+		<span class="commit-hash">{{ printf "%.7s" $c.hash }}</span>
+		<span class="commit-time">{{ date "2006-01-02 15:04" $c.date }}</span>
+		<span class="commit-author">{{ $c.author }}</span>
+	</div>
+	{{ $lines := split $c.message "\n" }}
+	{{ if gt (len $lines) 0 }}
+	<div class="commit-title">
+		<a href="{{ $site.Params.source_code_url }}/commit/{{ $c.hash }}">{{ index $lines 0 }}</a>
+	</div>
+	{{ if gt (len $lines) 1 }}
+	<div class="commit-msg">{{ join "\n" (slice $lines 1) }}</div>
+	{{ end }}
+	{{ end }}
+</div>

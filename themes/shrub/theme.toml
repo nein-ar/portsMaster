@@ -1,0 +1,3 @@
+name = "shrub"
+extends = "base"
+description = "Shrub's design: masthead, wording and terminal log styling."

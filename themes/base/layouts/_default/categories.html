@@ -1,0 +1,15 @@
+<div class="breadcrumb">
+	<a href="{{ href .Page.Path "/index.html" }}">home</a> / categories
+</div>
+
+<div class="main-content">
+	<div class="section-header">all categories</div>
+	<div class="category-grid">
+		{{ range .Site.Data.site.categories }}
+		<div class="category-box">
+			<a href="{{ href $.Page.Path (printf "/categories/%s/index.html" .name) }}">{{ .name }}</a><br/>
+			<span class="count">{{ .count }} ports</span>
+		</div>
+		{{ end }}
+	</div>
+</div>

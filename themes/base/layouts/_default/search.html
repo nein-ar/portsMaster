@@ -1,0 +1,98 @@
+<div class="breadcrumb">
+	<a href="{{ href .Page.Path "/index.html" }}">home</a> / search
+</div>
+
+<div class="section-header">Advanced Search</div>
+
+<form class="search-form" id="searchForm">
+	<div class="search-row">
+		<label for="query">Search Query</label>
+		<input type="text" id="query" name="query" placeholder="enter search terms or filter expression..."/>
+		<div class="search-examples">
+			<code>curl</code> - simple text search<br/>
+			<code>name:git AND category:devel</code> - logical operators<br/>
+			<code>provides:/usr/bin/vim</code> - file path search<br/>
+			<code>depends:libressl OR depends:openssl</code> - dependency search<br/>
+			<code>NOT category:devel</code> - negation<br/>
+			<code>is:broken</code> - find build failures<br/>
+			<code>is:new</code> - updated in last 30 days<br/>
+			<code>since:7d</code> - updated in last 7 days<br/>
+			<code>description:"web server"</code> - exact phrase match
+		</div>
+	</div>
+
+	<div class="filter-group">
+		<div class="filter-group-header">Search In</div>
+		<div class="filter-option">
+			<input type="checkbox" id="search_name" checked/> <label for="search_name">Port Name</label>
+		</div>
+		<div class="filter-option">
+			<input type="checkbox" id="search_desc" checked/> <label for="search_desc">Description</label>
+		</div>
+		<div class="filter-option">
+			<input type="checkbox" id="search_files"/> <label for="search_files">File Paths (provides)</label>
+		</div>
+		<div class="filter-option">
+			<input type="checkbox" id="search_deps"/> <label for="search_deps">Dependencies</label>
+		</div>
+	</div>
+
+	<div class="filter-group">
+		<div class="filter-group-header">Filters</div>
+		<div class="search-row">
+			<label>Category</label>
+			<select name="category" id="filter-category">
+				<option value="">any</option>
+				{{ range .Site.Data.site.categories }}
+				<option value="{{ .name }}">{{ .name }}</option>
+				{{ end }}
+			</select>
+		</div>
+	</div>
+
+	<div class="button-row">
+		<input type="submit" value="search"/>
+		<input type="reset" value="clear"/>
+	</div>
+</form>
+
+<div id="results" class="results display-none">
+	<div class="result-stats">
+		Found <strong id="resultCount">0</strong> ports matching query: <code id="queryDisplay"></code>
+		(search took <span id="searchTime">0</span>ms)
+	</div>
+	<table id="resultsTable">
+		<thead>
+			<tr>
+				<th>Port</th>
+				<th>Version</th>
+				<th>Category</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody id="resultsBody"></tbody>
+	</table>
+</div>
+
+<div class="section-header">Filter Syntax Reference</div>
+
+<table>
+	<thead>
+		<tr>
+			<th>Filter</th>
+			<th>Description</th>
+			<th>Example</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr><td><code>name:TERM</code></td><td>Search in port name</td><td><code>name:curl</code></td></tr>
+		<tr><td><code>description:TERM</code></td><td>Search in description</td><td><code>description:editor</code></td></tr>
+		<tr><td><code>category:CAT</code></td><td>Filter by category</td><td><code>category:network</code></td></tr>
+		<tr><td><code>provides:PATH</code></td><td>Find package providing file</td><td><code>provides:/usr/bin/git</code></td></tr>
+		<tr><td><code>depends:PKG</code></td><td>Find packages depending on PKG</td><td><code>depends:musl</code></td></tr>
+		<tr><td><code>AND</code></td><td>Logical AND operator</td><td><code>name:lib AND category:system</code></td></tr>
+		<tr><td><code>OR</code></td><td>Logical OR operator</td><td><code>category:audio OR category:video</code></td></tr>
+		<tr><td><code>NOT</code></td><td>Logical NOT operator</td><td><code>NOT license:GPL</code></td></tr>
+		<tr><td><code>"phrase"</code></td><td>Exact phrase match</td><td><code>description:"text editor"</code></td></tr>
+	</tbody>
+</table>

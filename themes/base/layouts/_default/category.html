@@ -1,0 +1,45 @@
+{{ $category := .Page.Params.category }}
+{{ $ports := .Site.Data.ports }}
+{{ $site := .Site.Data.site }}
+<div class="breadcrumb">
+	<a href="{{ href .Page.Path "/index.html" }}">home</a> / <a href="{{ href .Page.Path "/categories/index.html" }}">categories</a> / {{ $category }}
+</div>
+
+<div class="section-header">Category: {{ $category }}</div>
+{{ range $site.categories }}
+{{ if eq .name $category }}
+<p>{{ plural .count "port" }}</p>
+<table>
+	<thead>
+		<tr>
+			<th>Port</th>
+			<th>Version</th>
+			<th>Description</th>
+			<th>Updated</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{ range $key := .ports }}
+		{{ $p := index $ports.by_key $key }}
+		{{ with $p }}
+		<tr>
+			<td>
+				<div class="flex-center">
+					{{ template "partials/ci-status.html" . }}
+					<a href="{{ href $.Page.Path (printf "/ports/%s/%s/index.html" .category .name) }}" class="port-name">{{ .name }}</a>
+				</div>
+			</td>
+			<td class="version">{{ .version }}</td>
+			<td>{{ .description }}</td>
+			{{ if .last_commit }}
+			<td>{{ formatTime .last_commit.date }}</td>
+			{{ else }}
+			<td>-</td>
+			{{ end }}
+		</tr>
+		{{ end }}
+		{{ end }}
+	</tbody>
+</table>
+{{ end }}
+{{ end }}

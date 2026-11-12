@@ -1,0 +1,90 @@
+{{ $skin := default "shrub" .Site.Params.default_theme }}
+<!DOCTYPE html>
+<html lang="{{ .Site.Config.LanguageCode }}" data-theme="{{ $skin }}">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>{{ .Page.Title }} - {{ .Site.Title }}</title>
+	{{ with .Site.Params.domain }}
+	<link rel="canonical" href="https://{{ . }}/{{ $.Page.Path }}"/>
+	{{ end }}
+	{{ with .Site.Params.favicon }}
+	<link rel="icon" type="image/svg+xml" href="{{ href $.Page.Path (asset .) }}"/>
+	{{ end }}
+	<link rel="stylesheet" href="{{ href .Page.Path (asset "assets/theme-switch.css") }}"/>
+	<link rel="stylesheet" data-theme-css="shrub" media="{{ if eq $skin "shrub" }}all{{ else }}not all{{ end }}" href="{{ href .Page.Path (asset "assets/shrub/vars.css") }}"/>
+	<link rel="stylesheet" data-theme-css="shrub" media="{{ if eq $skin "shrub" }}all{{ else }}not all{{ end }}" href="{{ href .Page.Path (asset "assets/shrub/site.css") }}"/>
+	<link rel="stylesheet" data-theme-css="xplshn" media="{{ if eq $skin "xplshn" }}all{{ else }}not all{{ end }}" href="{{ href .Page.Path (asset "assets/xplshn/vars.css") }}"/>
+	<link rel="stylesheet" data-theme-css="xplshn" media="{{ if eq $skin "xplshn" }}all{{ else }}not all{{ end }}" href="{{ href .Page.Path (asset "assets/xplshn/site.css") }}"/>
+	<script>
+	// apply the saved theme before the first paint
+	(function () {
+		try {
+			var t = localStorage.getItem("ports-theme");
+			if (t !== "shrub" && t !== "xplshn") { return; }
+			document.documentElement.dataset.theme = t;
+			var links = document.querySelectorAll("link[data-theme-css]");
+			for (var i = 0; i < links.length; i++) {
+				links[i].media = links[i].getAttribute("data-theme-css") === t ? "all" : "not all";
+			}
+		} catch (e) {}
+	})();
+	</script>
+	{{ range .Site.Params.extra_css }}
+	<link rel="stylesheet" href="{{ href $.Page.Path (asset .) }}"/>
+	{{ end }}
+	<script src="{{ href .Page.Path (asset "assets/theme-switch.js") }}"></script>
+	<script src="{{ href .Page.Path (asset "assets/app.js") }}"></script>
+	{{ range .Site.Params.extra_js }}
+	<script src="{{ href $.Page.Path (asset .) }}"></script>
+	{{ end }}
+</head>
+<body data-source-code-url="{{ .Site.Params.source_code_url }}" data-base-url="{{ .Site.Config.BaseURL }}">
+	<header>
+		<div class="top-bar">
+			<a href="https://wayland.fyi">wl.fyi</a>
+			<span>|</span>
+			<a href="https://9larp.net">9larp</a>
+			<span>|</span>
+			<a href="https://derivelinux.org">main</a>
+			<span>|</span>
+			<a href="https://pkg.derivelinux.org">pkg</a>
+		</div>
+		<a href="{{ href .Page.Path "/index.html" }}" class="site-mark" aria-label="{{ .Site.Params.header_title }}">
+			<img src="{{ href .Page.Path (asset "assets/header.jpg") }}" alt="{{ .Site.Params.header_title }}" class="site-mark-image"/>
+		</a>
+	</header>
+
+	<nav>
+		{{ range .Site.Params.nav_links }}
+		<a href="{{ href $.Page.Path .url }}">{{ .text }}</a>
+		{{ end }}
+	</nav>
+
+	<div class="search-section">
+		{{ template "partials/search.html" . }}
+	</div>
+
+	{{ with .Site.Data.site }}
+	<div class="stats">
+		<span><strong>{{ .total_ports }}</strong> total ports</span>
+		<span><strong>{{ .updated_this_week }}</strong> updated this week</span>
+		<span><strong>{{ len .categories }}</strong> categories</span>
+		<span><strong>{{ .broken_count }}</strong> building failed</span>
+		<span>last update: {{ date "2006-01-02 15:04" .last_update }} UTC</span>
+	</div>
+	{{ end }}
+
+	<main class="main-content">
+		{{ .Body }}
+	</main>
+
+	<footer>
+		{{ $src := .Site.Params.source_code_url }}
+		{{ $srcLabel := trimPrefix (trimPrefix $src "https://") "http://" }}
+		{{ .Site.Params.footer_text }} - Source: <a href="{{ $src }}">{{ $srcLabel }}</a><br/>
+		derive is public domain software. all software listed is under it's respective license.
+		<div id="theme-switcher" class="theme-switcher" hidden aria-live="polite"></div>
+	</footer>
+</body>
+</html>

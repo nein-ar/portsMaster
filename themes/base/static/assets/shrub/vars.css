@@ -1,0 +1,23 @@
+:root {
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Liberation Mono", "DejaVu Sans Mono", monospace;
+
+  --bg: #6f1a1f;
+  --surface: #6f1a1f;
+  --surface-subtle: rgba(255, 255, 255, 0.04);
+
+  --text: #f4f0f0;
+  --text-soft: #e7caca;
+
+  --link: #ffd7d9;
+  --link-hover: #5e0707;
+  --link-hover-bg: #ffffff;
+
+  --line: rgba(255, 255, 255, 0.9);
+  --line-soft: rgba(255, 255, 255, 0.7);
+  --line-strong: rgba(255, 255, 255, 1);
+
+  --accent: #ffd7d9;
+  --accent-strong: #ffffff;
+  --highlight: rgba(255, 255, 255, 0.22);
+}

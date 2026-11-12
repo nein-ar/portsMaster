@@ -1,0 +1,10 @@
+{{ $ext := fileExt .name }}
+{{ $icons := dict "png" "picture" "jpg" "picture" "jpeg" "picture" "gif" "picture" "bmp" "picture" "svg" "picture" "webp" "picture" "py" "python" "js" "js" "html" "html" "css" "css" "json" "json" "md" "markdown" "lua" "lua" "php" "php" "rb" "ruby" "hs" "haskell" "swift" "swift" "java" "java" "kt" "kotlin" "tex" "latex" "diff" "diff" "cpp" "cpp" "cc" "cpp" "cxx" "cpp" "cs" "cs" "pl" "perl" }}
+{{ $icon := index $icons $ext }}
+{{ if $icon }}
+<span class="picon mr-5">{{ $icon }}</span>
+{{ else if eq $ext "" }}
+<span class="picon mr-5">file</span>
+{{ else }}
+<s class="picon-compose mr-5"><span class="picon-parent">file</span><span class="picon-child">{{ printf "%.2s" $ext }}</span></s>
+{{ end }}
